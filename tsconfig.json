@@ -1,0 +1,3 @@
+{
+  "extends": "@tatame-monorepo/config/tsconfig.base.json"
+}
