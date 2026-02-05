@@ -1,8 +1,8 @@
 # Backend Development Roadmap
 
-**Document version:** 1.2  
+**Document version:** 1.3  
 **Last updated:** 2026-02-05  
-**Status:** Phase 3 (Supabase coexistence) — Implemented.
+**Status:** Phase 4 (Stripe webhooks) — Implemented.
 
 ---
 
@@ -34,7 +34,7 @@ This roadmap defines a phased plan to evolve the Node.js (Express) backend from 
 | **1** | Stripe setup | Secure Stripe connection; list products and prices | Working Stripe-backed endpoints | ✅ Complete |
 | **2** | Auth integration | Validate Clerk JWT in Express; protect routes | Authenticated API access | ✅ Complete |
 | **3** | Supabase coexistence | Use Supabase from Express where needed; map Stripe ↔ users | Backend can read/write Supabase as required | ✅ Complete |
-| **4** | Webhooks (future) | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events | 🔜 Next |
+| **4** | Webhooks | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events | ✅ Complete |
 | **5** | Migration prep (future) | Plan and checklist for Supabase → Postgres | No execution in Phase 1 | 📋 Planned |
 
 ---
@@ -49,6 +49,7 @@ This roadmap defines a phased plan to evolve the Node.js (Express) backend from 
 | 04 | [Supabase Coexistence Strategy](./04-supabase-coexistence-strategy.md) | What stays in Supabase; mapping; migration readiness |
 | 05 | [Security and Best Practices](./05-security-and-best-practices.md) | Clerk verification; Stripe secrets; webhooks; logging and errors |
 | 06 | [Execution Templates](./06-execution-templates.md) | Reusable templates for Stripe setup, Auth, Supabase→Postgres, Webhooks |
+| 07 | [Webhook Setup Guide](./07-webhook-setup-guide.md) | Step-by-step guide for Stripe webhook configuration and testing |
 
 ---
 
@@ -80,7 +81,25 @@ Implemented the Supabase coexistence phase with the following:
 
 The backend now integrates with Supabase for storing user-Stripe customer mappings while keeping Stripe as the source of truth for products, prices, and customer data.
 
+### Phase 4 Complete (2026-02-05)
+
+Implemented the Stripe webhooks phase with the following:
+
+- **Environment variables:** Added `STRIPE_WEBHOOK_SECRET` to server env schema for webhook signature verification.
+- **Webhook route:** Created `POST /webhooks/stripe` endpoint that receives Stripe webhook events with raw body parsing for signature verification.
+- **Signature verification:** Implemented Stripe signature verification using `stripe.webhooks.constructEvent()` to ensure webhook authenticity.
+- **Idempotency:** Added Supabase-backed event tracking (`stripe_webhook_events` table) to process each event exactly once, even if Stripe retries delivery.
+- **Event dispatcher:** Created webhook service (`services/webhooks/`) with handlers for common Stripe events:
+  - Customer events: `customer.created`, `customer.updated`, `customer.deleted`
+  - Subscription events: `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
+  - Payment events: `invoice.payment_succeeded`, `invoice.payment_failed`
+  - Checkout events: `checkout.session.completed`, `checkout.session.expired`
+- **Raw body handling:** Configured Express to parse raw body for webhook route before JSON parser, ensuring signature verification works correctly.
+- **No authentication required:** Webhook route bypasses Clerk auth; security is enforced via Stripe signature verification.
+- **Documentation:** Updated `.env.example` with webhook secret configuration instructions.
+
+The backend is now ready to receive and process Stripe webhook events for real-time updates on subscriptions, payments, and customer changes.
+
 ### Next Steps
 
-- Phase 4: Implement Stripe webhooks for event handling
-- Phase 5: Plan and execute Supabase → Postgres migration
+- Phase 5: Plan and execute Supabase → Postgres migration (manual - not automated yet)
