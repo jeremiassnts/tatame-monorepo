@@ -17,6 +17,14 @@ export interface StripeCustomerMapping {
   updated_at?: string;
 }
 
+export interface StripeWebhookEvent {
+  id?: string;
+  stripe_event_id: string;
+  event_type: string;
+  processed_at?: string;
+  created_at?: string;
+}
+
 export const supabaseService = {
   /**
    * Get Stripe customer ID for a given Clerk user ID
@@ -88,5 +96,50 @@ export const supabaseService = {
     }
 
     return !!data;
+  },
+
+  /**
+   * Check if a webhook event has already been processed
+   */
+  async isWebhookEventProcessed(stripeEventId: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from("stripe_webhook_events")
+      .select("id")
+      .eq("stripe_event_id", stripeEventId)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        // No rows returned - event not processed yet
+        return false;
+      }
+      throw error;
+    }
+
+    return !!data;
+  },
+
+  /**
+   * Mark a webhook event as processed
+   */
+  async markWebhookEventProcessed(
+    stripeEventId: string,
+    eventType: string,
+  ): Promise<StripeWebhookEvent> {
+    const { data, error } = await supabase
+      .from("stripe_webhook_events")
+      .insert({
+        stripe_event_id: stripeEventId,
+        event_type: eventType,
+        processed_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
   },
 };

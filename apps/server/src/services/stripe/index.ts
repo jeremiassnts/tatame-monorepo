@@ -25,6 +25,13 @@ export interface CreateCustomerParams {
 
 export const stripeService = {
   /**
+   * Get the Stripe instance (for webhook verification)
+   */
+  getStripeInstance() {
+    return stripe;
+  },
+
+  /**
    * List Stripe products with optional filters
    */
   async listProducts(params: ListProductsParams = {}) {
