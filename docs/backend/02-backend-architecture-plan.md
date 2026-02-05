@@ -125,7 +125,7 @@
 - `.env` in `apps/server/` (or root if server loads from root). Never committed; use `.env.example` with placeholder keys.
 - Required for Phase 1 (Stripe): `STRIPE_SECRET_KEY`, `CORS_ORIGIN`, and existing server vars. If Postgres is not used, `DATABASE_URL` can be optional or a dummy value for env validation only.
 - Clerk: `CLERK_SECRET_KEY` or `CLERK_PUBLISHABLE_KEY` + JWKS URL for verification.
-- Supabase (when used): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (or anon key if no elevated access needed).
+- Supabase (when used): `SUPABASE_URL`, `SUPABASE_ANON_KEY` (or anon key if no elevated access needed).
 
 ### 6.2 Staging / Production
 

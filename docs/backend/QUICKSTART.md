@@ -42,7 +42,7 @@ CLERK_SECRET_KEY=sk_test_YOUR_KEY_HERE
 
 # Get from https://app.supabase.com/project/_/settings/api
 SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY_HERE
+SUPABASE_ANON_KEY=YOUR_SERVICE_ROLE_KEY_HERE
 
 # Set to your frontend URL
 CORS_ORIGIN=http://localhost:3001

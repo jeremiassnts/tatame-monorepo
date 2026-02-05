@@ -50,7 +50,7 @@ CLERK_SECRET_KEY=sk_test_...
 
 # Supabase (from https://app.supabase.com/project/_/settings/api)
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-service-role-key
 
 # Server
 NODE_ENV=development
@@ -195,7 +195,7 @@ pnpm check-types
 | `CLERK_PUBLISHABLE_KEY` | Yes | Clerk publishable key |
 | `CLERK_SECRET_KEY` | Yes | Clerk secret key |
 | `SUPABASE_URL` | Yes | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key |
+| `SUPABASE_ANON_KEY` | Yes | Supabase service role key |
 | `DATABASE_URL` | No | PostgreSQL connection (optional for Supabase-only mode) |
 
 ## Documentation

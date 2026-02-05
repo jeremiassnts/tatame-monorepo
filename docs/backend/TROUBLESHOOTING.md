@@ -29,7 +29,7 @@ Error: Invalid environment variables: ...
    - `CLERK_PUBLISHABLE_KEY`
    - `CLERK_SECRET_KEY`
    - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_ANON_KEY`
    - `CORS_ORIGIN`
 
 2. **Copy from example file:**
@@ -275,7 +275,7 @@ Supabase error: Invalid API key
 
 1. **Verify Supabase credentials:**
    - Check `SUPABASE_URL` format: `https://xxx.supabase.co`
-   - Verify `SUPABASE_SERVICE_ROLE_KEY` is service role (not anon key)
+   - Verify `SUPABASE_ANON_KEY` is service role (not anon key)
    - Get fresh credentials from: https://app.supabase.com/project/_/settings/api
 
 2. **Check network connectivity:**
@@ -319,7 +319,7 @@ new row violates row-level security policy
 1. **Use service role key (not anon key):**
    ```bash
    # .env
-   SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...  # Service role key
+   SUPABASE_ANON_KEY=eyJhbGc...  # Service role key
    # NOT the anon key
    ```
 

@@ -216,7 +216,7 @@ CLERK_SECRET_KEY=sk_live_...
 
 # Supabase (Production)
 SUPABASE_URL=https://your-prod-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-prod-service-role-key
+SUPABASE_ANON_KEY=your-prod-service-role-key
 
 # Database (Optional)
 # DATABASE_URL=postgresql://...  # If using Postgres

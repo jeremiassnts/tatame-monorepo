@@ -157,7 +157,7 @@ CLERK_SECRET_KEY=sk_test_...
 
 # Supabase
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-service-role-key
 ```
 
 ### 📚 Additional Resources

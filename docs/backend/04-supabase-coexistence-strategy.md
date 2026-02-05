@@ -58,7 +58,7 @@ Before any future migration from Supabase to Postgres (Drizzle) in this repo:
 ## 6. Supabase Usage Policy (Backend)
 
 - **Read/write:** Backend may read and write Supabase only where the product requires it (e.g. user profile, Stripe customer mapping). No speculative or duplicate storage of Stripe catalog.
-- **Credentials:** Use a single Supabase client (or minimal set) initialised from env (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` or anon key as appropriate). Prefer service role only when elevated access is required; restrict by RLS if using anon key.
+- **Credentials:** Use a single Supabase client (or minimal set) initialised from env (`SUPABASE_URL`, `SUPABASE_ANON_KEY` or anon key as appropriate). Prefer service role only when elevated access is required; restrict by RLS if using anon key.
 - **Errors:** Treat Supabase errors like any other integration: log, map to HTTP status (e.g. 502/503), and avoid exposing internal details to the client.
 - **No Postgres (Drizzle) in Phase 1:** Do not use `packages/db` or `DATABASE_URL` for app data until the migration phase.
 

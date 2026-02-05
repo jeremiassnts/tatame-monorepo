@@ -68,7 +68,7 @@ All notable changes to the Tatame backend implementation.
 - Supabase service layer (`services/supabase/`)
 
 **Environment:**
-- Added `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
+- Added `SUPABASE_URL` and `SUPABASE_ANON_KEY`
 
 **Database:**
 - Added `stripe_customer_mapping` table schema

@@ -72,7 +72,7 @@ All Stripe routes are protected by Clerk JWT authentication and return consisten
 
 Implemented the Supabase coexistence phase with the following:
 
-- **Environment variables:** Added `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to server env schema.
+- **Environment variables:** Added `SUPABASE_URL` and `SUPABASE_ANON_KEY` to server env schema.
 - **Dependencies:** Added `@supabase/supabase-js` client library to server.
 - **Services:** Created Supabase service layer (`services/supabase/`) with methods for managing Stripe customer mappings.
 - **Customer endpoint:** Implemented `POST /stripe/customer` endpoint that creates or retrieves Stripe customers with idempotent mapping to Clerk user IDs in Supabase.

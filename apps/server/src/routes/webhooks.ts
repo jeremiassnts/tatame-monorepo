@@ -1,13 +1,13 @@
 import { env } from "@tatame-monorepo/env/server";
-import { Router } from "express";
 import type { Request, Response } from "express";
+import { Router } from "express";
 import type Stripe from "stripe";
 import { AppError } from "../middleware/errorHandler";
 import { stripeService } from "../services/stripe";
 import { supabaseService } from "../services/supabase";
 import { webhookService } from "../services/webhooks";
 
-export const webhooksRouter = Router();
+export const webhooksRouter: Router = Router();
 
 /**
  * Stripe webhook endpoint

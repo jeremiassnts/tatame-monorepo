@@ -1,27 +1,11 @@
 import { env } from "@tatame-monorepo/env/server";
 import Stripe from "stripe";
+import type { CreateCustomerParams, ListPricesParams, ListProductsParams } from "./types";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-02-24.acacia",
   typescript: true,
 });
-
-export interface ListProductsParams {
-  active?: boolean;
-  limit?: number;
-}
-
-export interface ListPricesParams {
-  product?: string;
-  active?: boolean;
-  limit?: number;
-}
-
-export interface CreateCustomerParams {
-  email?: string;
-  name?: string;
-  metadata?: Record<string, string>;
-}
 
 export const stripeService = {
   /**

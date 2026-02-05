@@ -339,7 +339,7 @@ Response Sent
 │  CLERK_PUBLISHABLE_KEY=pk_test_...                           │
 │  CLERK_SECRET_KEY=sk_test_...                                │
 │  SUPABASE_URL=https://...                                    │
-│  SUPABASE_SERVICE_ROLE_KEY=...                               │
+│  SUPABASE_ANON_KEY=...                               │
 │  CORS_ORIGIN=http://localhost:3001                           │
 │  NODE_ENV=development                                        │
 └───────────────────────────┬──────────────────────────────────┘

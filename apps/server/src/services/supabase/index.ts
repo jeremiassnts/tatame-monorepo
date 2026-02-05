@@ -1,29 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@tatame-monorepo/env/server";
+import type { StripeCustomerMapping, StripeWebhookEvent } from "./types";
 
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 });
-
-export interface StripeCustomerMapping {
-  id?: string;
-  user_id: string;
-  clerk_user_id: string;
-  stripe_customer_id: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface StripeWebhookEvent {
-  id?: string;
-  stripe_event_id: string;
-  event_type: string;
-  processed_at?: string;
-  created_at?: string;
-}
 
 export const supabaseService = {
   /**
