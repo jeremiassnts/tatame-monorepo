@@ -17,6 +17,12 @@ export interface ListPricesParams {
   limit?: number;
 }
 
+export interface CreateCustomerParams {
+  email?: string;
+  name?: string;
+  metadata?: Record<string, string>;
+}
+
 export const stripeService = {
   /**
    * List Stripe products with optional filters
@@ -65,5 +71,23 @@ export const stripeService = {
     return await stripe.prices.retrieve(priceId, {
       expand: ["product"],
     });
+  },
+
+  /**
+   * Create a new Stripe customer
+   */
+  async createCustomer(params: CreateCustomerParams) {
+    return await stripe.customers.create({
+      email: params.email,
+      name: params.name,
+      metadata: params.metadata || {},
+    });
+  },
+
+  /**
+   * Get a Stripe customer by ID
+   */
+  async getCustomer(customerId: string) {
+    return await stripe.customers.retrieve(customerId);
   },
 };

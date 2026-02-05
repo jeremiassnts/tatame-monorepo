@@ -3,6 +3,7 @@ import { z } from "zod";
 import { protectRoute } from "../middleware/auth";
 import { AppError } from "../middleware/errorHandler";
 import { stripeService } from "../services/stripe";
+import { supabaseService } from "../services/supabase";
 
 export const stripeRouter = Router();
 
@@ -102,6 +103,64 @@ stripeRouter.get("/prices/:id", protectRoute, async (req, res, next) => {
 
     res.json({
       data: price,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+const createCustomerSchema = z.object({
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  metadata: z.record(z.string()).optional(),
+});
+
+stripeRouter.post("/customer", protectRoute, async (req, res, next) => {
+  try {
+    const auth = req.auth;
+
+    if (!auth?.userId) {
+      throw new AppError(401, "UNAUTHORIZED", "User not authenticated");
+    }
+
+    const clerkUserId = auth.userId;
+
+    // Check if customer already exists
+    const existingCustomerId =
+      await supabaseService.getStripeCustomerByClerkId(clerkUserId);
+
+    if (existingCustomerId) {
+      // Return existing customer
+      const customer = await stripeService.getCustomer(existingCustomerId);
+      return res.json({
+        data: customer,
+        created: false,
+      });
+    }
+
+    // Validate request body
+    const validatedBody = createCustomerSchema.parse(req.body);
+
+    // Create new Stripe customer
+    const customer = await stripeService.createCustomer({
+      email: validatedBody.email,
+      name: validatedBody.name,
+      metadata: {
+        ...validatedBody.metadata,
+        clerk_user_id: clerkUserId,
+      },
+    });
+
+    // Store mapping in Supabase
+    await supabaseService.upsertStripeCustomerMapping({
+      user_id: clerkUserId,
+      clerk_user_id: clerkUserId,
+      stripe_customer_id: customer.id,
+    });
+
+    res.status(201).json({
+      data: customer,
+      created: true,
     });
   } catch (error) {
     next(error);

@@ -1,8 +1,8 @@
 # Backend Development Roadmap
 
-**Document version:** 1.1  
+**Document version:** 1.2  
 **Last updated:** 2026-02-05  
-**Status:** Phase 1 (Stripe setup) — Implemented.
+**Status:** Phase 3 (Supabase coexistence) — Implemented.
 
 ---
 
@@ -33,8 +33,8 @@ This roadmap defines a phased plan to evolve the Node.js (Express) backend from 
 | **0** | Analysis & planning | Understand codebase; define architecture and API | This documentation set | ✅ Complete |
 | **1** | Stripe setup | Secure Stripe connection; list products and prices | Working Stripe-backed endpoints | ✅ Complete |
 | **2** | Auth integration | Validate Clerk JWT in Express; protect routes | Authenticated API access | ✅ Complete |
-| **3** | Supabase coexistence | Use Supabase from Express where needed; map Stripe ↔ users | Backend can read/write Supabase as required | 🔜 Next |
-| **4** | Webhooks (future) | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events | 📋 Planned |
+| **3** | Supabase coexistence | Use Supabase from Express where needed; map Stripe ↔ users | Backend can read/write Supabase as required | ✅ Complete |
+| **4** | Webhooks (future) | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events | 🔜 Next |
 | **5** | Migration prep (future) | Plan and checklist for Supabase → Postgres | No execution in Phase 1 | 📋 Planned |
 
 ---
@@ -67,8 +67,20 @@ Implemented the Stripe setup phase with the following:
 
 All Stripe routes are protected by Clerk JWT authentication and return consistent error responses per the API design.
 
+### Phase 3 Complete (2026-02-05)
+
+Implemented the Supabase coexistence phase with the following:
+
+- **Environment variables:** Added `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to server env schema.
+- **Dependencies:** Added `@supabase/supabase-js` client library to server.
+- **Services:** Created Supabase service layer (`services/supabase/`) with methods for managing Stripe customer mappings.
+- **Customer endpoint:** Implemented `POST /stripe/customer` endpoint that creates or retrieves Stripe customers with idempotent mapping to Clerk user IDs in Supabase.
+- **Mapping logic:** Store `clerk_user_id` ↔ `stripe_customer_id` in Supabase `stripe_customer_mapping` table for future subscription and payment handling.
+- **Documentation:** Updated `.env.example` with Supabase credentials.
+
+The backend now integrates with Supabase for storing user-Stripe customer mappings while keeping Stripe as the source of truth for products, prices, and customer data.
+
 ### Next Steps
 
-- Phase 3: Implement Supabase coexistence for user-Stripe customer mapping
 - Phase 4: Implement Stripe webhooks for event handling
 - Phase 5: Plan and execute Supabase → Postgres migration
