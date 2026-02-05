@@ -10,11 +10,13 @@
     "start": "node dist/index.mjs"
   },
   "dependencies": {
+    "@clerk/express": "^1.4.5",
     "@tatame-monorepo/db": "workspace:*",
     "@tatame-monorepo/env": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "catalog:",
     "express": "^5.1.0",
+    "stripe": "^17.6.0",
     "zod": "catalog:"
   },
   "devDependencies": {

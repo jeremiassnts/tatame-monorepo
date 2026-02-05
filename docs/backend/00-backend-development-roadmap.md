@@ -1,8 +1,8 @@
 # Backend Development Roadmap
 
-**Document version:** 1.0  
+**Document version:** 1.1  
 **Last updated:** 2026-02-05  
-**Status:** Planning only — no implementation.
+**Status:** Phase 1 (Stripe setup) — Implemented.
 
 ---
 
@@ -28,14 +28,14 @@ This roadmap defines a phased plan to evolve the Node.js (Express) backend from 
 
 ## Phased Roadmap
 
-| Phase | Name | Objective | Outcome |
-|-------|------|-----------|---------|
-| **0** | Analysis & planning | Understand codebase; define architecture and API | This documentation set |
-| **1** | Stripe setup | Secure Stripe connection; list products and prices | Working Stripe-backed endpoints |
-| **2** | Auth integration | Validate Clerk JWT in Express; protect routes | Authenticated API access |
-| **3** | Supabase coexistence | Use Supabase from Express where needed; map Stripe ↔ users | Backend can read/write Supabase as required |
-| **4** | Webhooks (future) | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events |
-| **5** | Migration prep (future) | Plan and checklist for Supabase → Postgres | No execution in Phase 1 |
+| Phase | Name | Objective | Outcome | Status |
+|-------|------|-----------|---------|--------|
+| **0** | Analysis & planning | Understand codebase; define architecture and API | This documentation set | ✅ Complete |
+| **1** | Stripe setup | Secure Stripe connection; list products and prices | Working Stripe-backed endpoints | ✅ Complete |
+| **2** | Auth integration | Validate Clerk JWT in Express; protect routes | Authenticated API access | ✅ Complete |
+| **3** | Supabase coexistence | Use Supabase from Express where needed; map Stripe ↔ users | Backend can read/write Supabase as required | 🔜 Next |
+| **4** | Webhooks (future) | Stripe webhook endpoint; signature verification; idempotency | Ready for subscriptions/events | 📋 Planned |
+| **5** | Migration prep (future) | Plan and checklist for Supabase → Postgres | No execution in Phase 1 | 📋 Planned |
 
 ---
 
@@ -52,9 +52,23 @@ This roadmap defines a phased plan to evolve the Node.js (Express) backend from 
 
 ---
 
-## Constraints (Reminder)
+## Implementation Status
 
-- **No code implementation** in this planning phase.
-- **No Postgres migration** until a later phase.
-- **No frontend changes** in Phase 1.
-- **No SQL or Stripe code** in the deliverables — planning and documentation only.
+### Phase 1 Complete (2026-02-05)
+
+Implemented the Stripe setup phase with the following:
+
+- **Environment variables:** Added `STRIPE_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY` to server env schema; made `DATABASE_URL` optional for Supabase-only mode.
+- **Dependencies:** Added Stripe SDK and @clerk/express to server.
+- **Services:** Created Stripe service layer (`services/stripe/`) that encapsulates all Stripe API calls.
+- **Middleware:** Implemented Clerk authentication middleware and centralized error handler.
+- **Routes:** Created `/stripe/products` and `/stripe/prices` endpoints with authentication and query parameter validation.
+- **Documentation:** Created `.env.example` with all required environment variables.
+
+All Stripe routes are protected by Clerk JWT authentication and return consistent error responses per the API design.
+
+### Next Steps
+
+- Phase 3: Implement Supabase coexistence for user-Stripe customer mapping
+- Phase 4: Implement Stripe webhooks for event handling
+- Phase 5: Plan and execute Supabase → Postgres migration
