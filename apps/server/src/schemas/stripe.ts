@@ -4,7 +4,7 @@ export const listProductsSchema = z.object({
     active: z
         .string()
         .optional()
-        .transform((val) => val === "true"),
+        .transform((val) => val === undefined ? undefined : val === "true"),
     limit: z
         .string()
         .optional()
@@ -19,7 +19,7 @@ export const listPricesSchema = z.object({
     active: z
         .string()
         .optional()
-        .transform((val) => val === "true"),
+        .transform((val) => val === undefined ? undefined : val === "true"),
     limit: z
         .string()
         .optional()

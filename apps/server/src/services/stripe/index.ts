@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import type { CreateCustomerParams, ListPricesParams, ListProductsParams } from "./types";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-02-24.acacia",
+  apiVersion: '2025-02-24.acacia',
   typescript: true,
 });
 

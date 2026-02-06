@@ -33,7 +33,7 @@ export const errorHandler = (
       error: {
         code: err.code,
         message: err.message,
-        ...(err.details && { details: err.details }),
+        ...(err.details ? { details: err.details } : {}),
       },
     });
   }
@@ -53,7 +53,7 @@ export const errorHandler = (
       error: {
         code: "VALIDATION_ERROR",
         message: "Invalid request parameters.",
-        details: err.errors,
+        details: err.issues,
       },
     });
   }
