@@ -33,9 +33,11 @@ export const createCustomerSchema = z.object({
     email: z.string().email().optional(),
     name: z.string().optional(),
     metadata: z.record(z.string(), z.string()).optional(),
+    userId: z.number(),
 });
 
 export const createSubscriptionSchema = z.object({
+    userId: z.number(),
     customerId: z.string(),
     priceId: z.string(),
 });

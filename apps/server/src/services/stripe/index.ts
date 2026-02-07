@@ -64,6 +64,15 @@ export const stripeService = {
     });
   },
   /**
+   * Get a Stripe subscription by customerId
+   */
+  async getSubscriptionByCustomerId(customerId: string) {
+    const { data } = await stripe.subscriptions.list({
+      customer: customerId,
+    });
+    return data[0]
+  },
+  /**
    * Get a Stripe subscription by ID
    */
   async getSubscription(subscriptionId: string) {

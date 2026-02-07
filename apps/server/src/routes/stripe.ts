@@ -1,4 +1,5 @@
 import { createCustomerSchema, createEphemeralKeySchema, createPaymentIntentSchema, createSetupIntentSchema, createSubscriptionSchema, listProductsSchema } from "@/schemas/stripe";
+import { SupabaseService } from "@/services/supabase";
 import { Router } from "express";
 import { stripeService } from "../services/stripe";
 
@@ -33,7 +34,14 @@ stripeRouter.post("/customers", async (req, res, next) => {
       metadata: {
         ...validatedBody.metadata,
         clerk_user_id: req.auth?.userId ?? "",
+        user_id: validatedBody.userId?.toString(),
       },
+    });
+    // Update user with customer_id
+    const supabaseService = new SupabaseService(await req.auth?.getToken() ?? "");
+    await supabaseService.updateUser({
+      id: validatedBody.userId,
+      customer_id: customer?.id,
     });
     res.status(201).json({
       data: customer,
@@ -53,9 +61,28 @@ stripeRouter.post("/subscriptions", async (req, res, next) => {
       customerId: validatedBody.customerId,
       priceId: validatedBody.priceId,
     });
+    // Update user with subscription_id
+    const supabaseService = new SupabaseService(await req.auth?.getToken() ?? "");
+    await supabaseService.updateUser({
+      id: validatedBody.userId,
+      subscription_id: subscription?.id,
+    });
     res.status(201).json({
       data: subscription,
       created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+stripeRouter.get("/subscriptions/customer/:customerId", async (req, res, next) => {
+  try {
+    const customerId = req.params.customerId;
+    // Find subscription by customerId
+    const subscription = await stripeService.getSubscriptionByCustomerId(customerId);
+    res.status(200).json({
+      data: subscription,
     });
   } catch (error) {
     next(error);
