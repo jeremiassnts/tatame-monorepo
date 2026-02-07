@@ -16,6 +16,9 @@ export const authMiddleware: RequestHandler = clerkMiddleware({
  * Returns 401 for unauthenticated requests (suitable for APIs)
  */
 export const requireAuth: RequestHandler = (req, res, next) => {
+  if (req.path.startsWith("/webhooks")) {
+    return next();
+  }
   const auth = getAuth(req);
 
   if (!auth?.userId) {

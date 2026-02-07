@@ -30,6 +30,12 @@ export const stripeService = {
     return products.data;
   },
   /**
+   * Get a Stripe product by ID
+   */
+  async getProduct(productId: string) {
+    return await stripe.products.retrieve(productId);
+  },
+  /**
    * Create a new Stripe customer
    */
   async createCustomer(params: CreateCustomerParams) {
@@ -49,7 +55,11 @@ export const stripeService = {
    * Get a Stripe customer by ID
    */
   async getCustomer(customerId: string) {
-    return await stripe.customers.retrieve(customerId);
+    const customer = await stripe.customers.retrieve(customerId);
+    if (!customer || customer.deleted) {
+      throw new Error("Customer not found");
+    }
+    return customer;
   },
   /**
    * Create a new Stripe subscription
