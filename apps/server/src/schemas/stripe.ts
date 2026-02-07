@@ -34,3 +34,22 @@ export const createCustomerSchema = z.object({
     name: z.string().optional(),
     metadata: z.record(z.string(), z.string()).optional(),
 });
+
+export const createSubscriptionSchema = z.object({
+    customerId: z.string(),
+    priceId: z.string(),
+});
+
+export const createPaymentIntentSchema = z.object({
+    amount: z.number(),
+    currency: z.string(),
+    customerId: z.string(),
+});
+
+export const createSetupIntentSchema = z.object({
+    customerId: z.string(),
+});
+
+export const createEphemeralKeySchema = z.object({
+    customerId: z.string(),
+});

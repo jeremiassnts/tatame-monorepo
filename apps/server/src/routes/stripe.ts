@@ -1,4 +1,4 @@
-import { listProductsSchema } from "@/schemas/stripe";
+import { createCustomerSchema, createEphemeralKeySchema, createPaymentIntentSchema, createSetupIntentSchema, createSubscriptionSchema, listProductsSchema } from "@/schemas/stripe";
 import { Router } from "express";
 import { stripeService } from "../services/stripe";
 
@@ -22,109 +22,91 @@ stripeRouter.get("/products", async (req, res, next) => {
   }
 });
 
-// stripeRouter.get("/prices", protectRoute, async (req, res, next) => {
-//   try {
-//     const validatedQuery = listPricesSchema.parse(req.query);
+stripeRouter.post("/customers", async (req, res, next) => {
+  try {
+    // Validate request body
+    const validatedBody = createCustomerSchema.parse(req.body);
+    // Create new Stripe customer
+    const customer = await stripeService.createCustomer({
+      email: validatedBody.email,
+      name: validatedBody.name,
+      metadata: {
+        ...validatedBody.metadata,
+        clerk_user_id: req.auth?.userId ?? "",
+      },
+    });
+    res.status(201).json({
+      data: customer,
+      created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-//     const prices = await stripeService.listPrices({
-//       product: validatedQuery.product,
-//       active: validatedQuery.active,
-//       limit: validatedQuery.limit,
-//     });
+stripeRouter.post("/subscriptions", async (req, res, next) => {
+  try {
+    // Validate request body
+    const validatedBody = createSubscriptionSchema.parse(req.body);
+    // Create new Stripe customer
+    const subscription = await stripeService.createSubscription({
+      customerId: validatedBody.customerId,
+      priceId: validatedBody.priceId,
+    });
+    res.status(201).json({
+      data: subscription,
+      created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-//     res.json({
-//       data: prices,
-//       count: prices.length,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+stripeRouter.post("/payment-intents", async (req, res, next) => {
+  try {
+    // Validate request body
+    const validatedBody = createPaymentIntentSchema.parse(req.body);
+    // Create new Stripe payment intent
+    const paymentIntent = await stripeService.createPaymentIntent({
+      amount: validatedBody.amount,
+      currency: validatedBody.currency,
+      customerId: validatedBody.customerId,
+    });
+    res.status(201).json({
+      data: paymentIntent,
+      created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-// stripeRouter.get("/products/:id", protectRoute, async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
+stripeRouter.post("/setup-intents", async (req, res, next) => {
+  try {
+    // Validate request body
+    const validatedBody = createSetupIntentSchema.parse(req.body);
+    // Create new Stripe setup intent
+    const setupIntent = await stripeService.createSetupIntent(validatedBody.customerId);
+    res.status(201).json({
+      data: setupIntent,
+      created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-//     if (!id) {
-//       throw new AppError(400, "INVALID_PRODUCT_ID", "Product ID is required");
-//     }
-
-//     const product = await stripeService.getProduct(id as string);
-
-//     res.json({
-//       data: product,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// stripeRouter.get("/prices/:id", protectRoute, async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-
-//     if (!id) {
-//       throw new AppError(400, "INVALID_PRICE_ID", "Price ID is required");
-//     }
-
-//     const price = await stripeService.getPrice(id as string);
-
-//     res.json({
-//       data: price,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-// stripeRouter.post("/customer", protectRoute, async (req, res, next) => {
-//   try {
-//     const auth = req.auth;
-
-//     if (!auth?.isAuthenticated) {
-//       throw new AppError(401, "UNAUTHORIZED", "User not authenticated");
-//     }
-
-//     const clerkUserId = auth.userId;
-
-//     // Check if customer already exists
-//     const existingCustomerId =
-//       await supabaseService.getStripeCustomerByClerkId(clerkUserId);
-
-//     if (existingCustomerId) {
-//       // Return existing customer
-//       const customer = await stripeService.getCustomer(existingCustomerId);
-//       return res.json({
-//         data: customer,
-//         created: false,
-//       });
-//     }
-
-//     // Validate request body
-//     const validatedBody = createCustomerSchema.parse(req.body);
-
-//     // Create new Stripe customer
-//     const customer = await stripeService.createCustomer({
-//       email: validatedBody.email,
-//       name: validatedBody.name,
-//       metadata: {
-//         ...validatedBody.metadata,
-//         clerk_user_id: clerkUserId,
-//       },
-//     });
-
-//     // Store mapping in Supabase
-//     await supabaseService.upsertStripeCustomerMapping({
-//       user_id: clerkUserId,
-//       clerk_user_id: clerkUserId,
-//       stripe_customer_id: customer.id,
-//     });
-
-//     res.status(201).json({
-//       data: customer,
-//       created: true,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+stripeRouter.post("/ephemeral-keys", async (req, res, next) => {
+  try {
+    // Validate request body
+    const validatedBody = createEphemeralKeySchema.parse(req.body);
+    // Create new Stripe ephemeral key
+    const ephemeralKey = await stripeService.createEphemeralKey(validatedBody.customerId);
+    res.status(201).json({
+      data: ephemeralKey,
+      created: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+});

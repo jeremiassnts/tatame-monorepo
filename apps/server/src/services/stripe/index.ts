@@ -1,6 +1,6 @@
 import { env } from "@tatame-monorepo/env/server";
 import Stripe from "stripe";
-import type { CreateCustomerParams, ListPricesParams, ListProductsParams } from "./types";
+import type { CreateCustomerParams, CreatePaymentIntentParams, CreateSubscriptionParams, ListProductsParams } from "./types";
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-02-24.acacia',
@@ -29,56 +29,73 @@ export const stripeService = {
 
     return products.data;
   },
-
-  /**
-   * List Stripe prices with optional filters
-   */
-  async listPrices(params: ListPricesParams = {}) {
-    const { product, active = true, limit = 10 } = params;
-
-    const prices = await stripe.prices.list({
-      product,
-      active,
-      limit: Math.min(limit, 100),
-      expand: ["data.product"],
-    });
-
-    return prices.data;
-  },
-
-  /**
-   * Get a single product by ID
-   */
-  async getProduct(productId: string) {
-    return await stripe.products.retrieve(productId, {
-      expand: ["default_price"],
-    });
-  },
-
-  /**
-   * Get a single price by ID
-   */
-  async getPrice(priceId: string) {
-    return await stripe.prices.retrieve(priceId, {
-      expand: ["product"],
-    });
-  },
-
   /**
    * Create a new Stripe customer
    */
   async createCustomer(params: CreateCustomerParams) {
+    const customer = await stripe.customers.list({
+      email: params.email,
+    })
+    if (customer.data.length > 0) {
+      return customer.data[0];
+    }
     return await stripe.customers.create({
       email: params.email,
       name: params.name,
       metadata: params.metadata || {},
     });
   },
-
   /**
    * Get a Stripe customer by ID
    */
   async getCustomer(customerId: string) {
     return await stripe.customers.retrieve(customerId);
+  },
+  /**
+   * Create a new Stripe subscription
+   */
+  async createSubscription(params: CreateSubscriptionParams) {
+    return await stripe.subscriptions.create({
+      customer: params.customerId,
+      items: [{ price: params.priceId }],
+      payment_behavior: 'default_incomplete',
+      expand: ['latest_invoice.payment_intent'],
+      trial_period_days: 30
+    });
+  },
+  /**
+   * Get a Stripe subscription by ID
+   */
+  async getSubscription(subscriptionId: string) {
+    return await stripe.subscriptions.retrieve(subscriptionId);
+  },
+  /** 
+   * Create a new Stripe payment intent
+   */
+  async createPaymentIntent(params: CreatePaymentIntentParams) {
+    return await stripe.paymentIntents.create({
+      amount: params.amount,
+      currency: params.currency,
+      customer: params.customerId,
+    });
+  },
+  /**
+   * Create a new Stripe SetupIntent
+   */
+  async createSetupIntent(customerId: string) {
+    return await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+    });
+  },
+
+  /**
+   * Create a new Stripe EphemeralKey
+   */
+  async createEphemeralKey(customerId: string) {
+    return await stripe.ephemeralKeys.create(
+      { customer: customerId },
+      { apiVersion: '2025-02-24.acacia' }
+    );
   },
 };
