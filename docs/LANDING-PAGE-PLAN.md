@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1–10 complete
+**Status:** 🚧 In progress — Phases 1–11 complete
 
 ---
 
@@ -2228,7 +2228,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 11 — Analytics e preparação para lançamento
+### Phase 11 — Analytics e preparação para lançamento ✅ *Completed 2026-02-08*
 
 **Goal:** Configurar analytics (GA4/GTM) e event tracking dos CTAs; verificar que a página está pronta para produção.
 
@@ -2237,12 +2237,19 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§10.5** (eventos a trackear, exemplo de `trackEvent`).
 
 **Tasks:**
-- [ ] Configurar Google Analytics 4 (e opcionalmente GTM) no layout ou _document; variáveis de ambiente para IDs.
-- [ ] `lib/analytics.ts`: função `trackEvent(eventName, params)`; chamadas em CTAs (navbar, hero, pricing, CTA final) com parâmetros como `location` e `plan`.
-- [ ] Eventos sugeridos: pageview (automático se GA4), cta_click, scroll_depth (opcional).
-- [ ] Revisão final: links, copy, responsividade, testes em um browser e dispositivo móvel.
+- [x] Configurar Google Analytics 4 (e opcionalmente GTM) no layout ou _document; variáveis de ambiente para IDs.
+- [x] `lib/analytics.ts`: função `trackEvent(eventName, params)`; chamadas em CTAs (navbar, hero, pricing, CTA final) com parâmetros como `location` e `plan`.
+- [x] Eventos sugeridos: pageview (automático se GA4), cta_click, scroll_depth (opcional).
+- [ ] Revisão final: links, copy, responsividade, testes em um browser e dispositivo móvel. *(a cargo do time; estrutura pronta.)*
 
 **Deliverables:** Analytics instalado e eventos de conversão disparando; checklist de pré-lançamento atendido.
+
+**Implemented:**
+- **GA4**: `components/landing/google-analytics.tsx` carrega gtag quando `NEXT_PUBLIC_GA_MEASUREMENT_ID` está definido; script injetado no `(landing)/layout.tsx`.
+- **lib/analytics.ts**: `trackEvent`, `trackCtaClick(params)`, `trackScrollDepth(params)`; no-op quando gtag não está carregado.
+- **cta_click** em: NavbarCTA (location: navbar, plan: standard), HeroContent (hero, primary/secondary), PricingCard (pricing, plan: free|standard), CTAFinalSection (cta_final, plan: standard).
+- **scroll_depth**: hook `useScrollDepth` em `lib/hooks/use-scroll-depth.ts` (25%, 50%, 75%, 100%); `ScrollDepthTracker` na landing page.
+- Variável de ambiente: `NEXT_PUBLIC_GA_MEASUREMENT_ID` (ex.: `G-XXXXXXXXXX`) para ativar GA4.
 
 **Out of scope:** Deploy em produção e domínio (próxima fase).
 
@@ -2280,7 +2287,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 8 ✅ | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection — *done* |
 | 9 ✅ | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion — *done* |
 | 10 ✅ | Performance, a11y, SEO | Imagens (placeholders), Lighthouse-ready, a11y, metadata, JSON-LD, sitemap, robots — *done* |
-| 11 | Analytics | GA4/GTM, trackEvent, eventos em CTAs |
+| 11 ✅ | Analytics | GA4, trackEvent, cta_click em todos os CTAs, scroll_depth — *done* |
 | 12 | Testes e deploy | Cross-browser, mobile, deploy, domínio, monitoramento |
 
 ---
@@ -2353,9 +2360,9 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] robots.txt configured (Phase 10)
 
 ### 12.8 Analytics
-- [ ] Google Analytics 4 installed
-- [ ] Event tracking implemented
-- [ ] Conversion tracking configured
+- [x] Google Analytics 4 installed (Phase 11 — NEXT_PUBLIC_GA_MEASUREMENT_ID, GoogleAnalytics component)
+- [x] Event tracking implemented (Phase 11 — cta_click, scroll_depth)
+- [x] Conversion tracking configured (cta_click com location/plan)
 - [ ] Hotjar/Clarity installed (optional)
 
 ### 12.9 Testing
@@ -2572,4 +2579,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 8, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–10 implemented; ready for Phase 11
+**Status**: 🚧 Phases 1–11 implemented; ready for Phase 12

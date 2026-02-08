@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 
+import { GoogleAnalytics } from "@/components/landing/google-analytics";
 import { StructuredData } from "@/components/landing/structured-data";
 
 const bricolageGrotesque = Bricolage_Grotesque({
@@ -67,8 +68,11 @@ export default function LandingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   return (
     <div className={`${bricolageGrotesque.className} dark`}>
+      {gaId && <GoogleAnalytics gaId={gaId} />}
       <StructuredData />
       {children}
     </div>

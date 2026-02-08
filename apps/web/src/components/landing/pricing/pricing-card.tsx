@@ -2,8 +2,9 @@
 
 import type { PricingPlan } from "@/types/landing";
 import { FeatureList } from "@/components/ui/feature-list";
-import { PricingBadge } from "./pricing-badge";
+import { trackCtaClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { PricingBadge } from "./pricing-badge";
 
 interface PricingCardProps {
   plan: PricingPlan;
@@ -57,6 +58,12 @@ export function PricingCard({ plan, className }: PricingCardProps) {
               ? "bg-gradient-to-br from-[#A376FF] to-[#8B5CF6] text-white shadow-[0_4px_14px_0_rgba(163,118,255,0.25)] hover:-translate-y-px hover:shadow-[0_6px_20px_0_rgba(163,118,255,0.4)]"
               : "border border-border bg-transparent text-foreground hover:bg-muted/50"
           )}
+          onClick={() =>
+            trackCtaClick({
+              location: "pricing",
+              plan: plan.id as "free" | "standard",
+            })
+          }
         >
           {plan.cta}
         </a>

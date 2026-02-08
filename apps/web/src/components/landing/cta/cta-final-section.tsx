@@ -1,5 +1,8 @@
+"use client";
+
 import { SectionContainer } from "@/components/shared/section-container";
 import { AnimateOnView } from "@/components/shared/animate-on-view";
+import { trackCtaClick } from "@/lib/analytics";
 
 const HEADLINE = "Pronto para transformar a gestão da sua academia?";
 const SUBHEADLINE = "Comece hoje e veja os resultados";
@@ -27,6 +30,9 @@ export function CTAFinalSection() {
           href="#pricing"
           className={ctaButtonClass}
           aria-label="Assinar plano Standard"
+          onClick={() =>
+            trackCtaClick({ location: "cta_final", plan: "standard" })
+          }
         >
           {CTA_LABEL}
         </a>
