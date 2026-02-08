@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1, 2, 3, 4 and 5 complete
+**Status:** 🚧 In progress — Phases 1, 2, 3, 4, 5 and 6 complete
 
 ---
 
@@ -2101,7 +2101,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 6 — Benefícios
+### Phase 6 — Benefícios ✅ *Completed 2026-02-07*
 
 **Goal:** Seção de benefícios com layout zig-zag (alternado esquerda/direita no desktop) e lista de features com ícone.
 
@@ -2110,11 +2110,11 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§6.3** (BenefitsSection, BenefitCard, layout, conteúdo).
 
 **Tasks:**
-- [ ] `components/landing/benefits/benefits-section.tsx`: título da seção (H2), map de BENEFITS em BenefitCard; SectionContainer; padding vertical §6.3.
-- [ ] `components/landing/benefits/benefit-card.tsx`: recebe benefit + index; no desktop, se index par: texto à esquerda e visual à direita; ímpar: inverso. Mobile: sempre visual em cima, texto embaixo.
-- [ ] `components/landing/benefits/benefit-visual.tsx`: usar AppScreenshotPlaceholder com variant do benefit.
-- [ ] Conteúdo e features: usar BENEFITS de `lib/constants/benefits.ts` e FeatureList para a lista de features.
-- [ ] Em `page.tsx`, substituir placeholder de Benefícios por `<BenefitsSection />`.
+- [x] `components/landing/benefits/benefits-section.tsx`: título da seção (H2), map de BENEFITS em BenefitCard; SectionContainer; padding vertical §6.3.
+- [x] `components/landing/benefits/benefit-card.tsx`: recebe benefit + index; no desktop, se index par: texto à esquerda e visual à direita; ímpar: inverso. Mobile: sempre visual em cima, texto embaixo.
+- [x] `components/landing/benefits/benefit-visual.tsx`: usar AppScreenshotPlaceholder com variant do benefit.
+- [x] Conteúdo e features: usar BENEFITS de `lib/constants/benefits.ts` e FeatureList para a lista de features.
+- [x] Em `page.tsx`, substituir placeholder de Benefícios por `<BenefitsSection />`.
 
 **Deliverables:** Seção Benefícios completa com 4 blocos alternados e listas de features.
 
@@ -2256,7 +2256,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 3 ✅ | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) — *done* |
 | 4 ✅ | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders — *done* |
 | 5 ✅ | Hero | HeroSection com headline, descrição, CTA, visual — *done* |
-| 6 | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards |
+| 6 ✅ | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards — *done* |
 | 7 | Pricing | PricingSection com Free e Standard |
 | 8 | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection |
 | 9 | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion |
@@ -2290,7 +2290,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] Logo (Phase 2)
 - [x] LandingNavbar
 - [x] HeroSection
-- [ ] BenefitsSection
+- [x] BenefitsSection
 - [ ] PricingSection
 - [ ] FAQSection
 - [ ] CTAFinalSection
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–5 implemented; ready for Phase 6
+**Status**: 🚧 Phases 1–6 implemented; ready for Phase 7
