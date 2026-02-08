@@ -1,10 +1,7 @@
+import type { AppScreenshotPlaceholderVariant } from "@/types/landing";
 import { cn } from "@/lib/utils";
 
-export type AppScreenshotPlaceholderVariant =
-  | "financial"
-  | "student-list"
-  | "class-schedule"
-  | "analytics";
+export type { AppScreenshotPlaceholderVariant };
 
 export interface AppScreenshotPlaceholderProps {
   variant: AppScreenshotPlaceholderVariant;

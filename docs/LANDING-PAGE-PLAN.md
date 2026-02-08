@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1 and 2 complete
+**Status:** 🚧 In progress — Phases 1, 2 and 3 complete
 
 ---
 
@@ -2031,7 +2031,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 3 — Conteúdo e constantes
+### Phase 3 — Conteúdo e constantes ✅ *Completed 2026-02-07*
 
 **Goal:** Todo o copy e dados da landing em arquivos type-safe em `lib/constants/` e types em `types/landing.ts`.
 
@@ -2042,16 +2042,16 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - **§6.2** (hero), **§6.3** (benefícios), **§6.4** (pricing), **§6.5** (FAQ), **§6.7** (footer): exemplos de conteúdo.
 
 **Tasks:**
-- [ ] `types/landing.ts`: tipos para Hero, Benefit, PricingPlan, FAQItem, FooterLinks (alinhados aos exemplos do §6).
-- [ ] `lib/constants/hero.ts`: headline, description, cta (primary/secondary) — §6.2.
-- [ ] `lib/constants/benefits.ts`: 4 itens com id, title, description, features, imagePlaceholder, imageAlt — §6.3.
-- [ ] `lib/constants/pricing.ts`: planos Free e Standard (id, name, tagline, price, currency, interval, features, cta, highlighted, badge) — §6.4.
-- [ ] `lib/constants/faq.ts`: 5 perguntas e respostas — §6.5.
-- [ ] `lib/constants/footer.ts`: FOOTER_LINKS (product, legal, contact, apps) — §6.7.
+- [x] `types/landing.ts`: HeroContent, Benefit, PricingPlan, FAQItem, FooterLinkItem, FooterLinks, AppScreenshotPlaceholderVariant (alinhados ao §6).
+- [x] `lib/constants/hero.ts`: HERO_CONTENT (headline, description, cta primary/secondary) — §6.2.
+- [x] `lib/constants/benefits.ts`: BENEFITS — 4 itens (financial-control, student-management, class-organization, growth-insights) com imagePlaceholder alinhado ao componente — §6.3.
+- [x] `lib/constants/pricing.ts`: PRICING_PLANS — Free e Standard com tagline, price, interval, features, cta, highlighted, badge — §6.4.
+- [x] `lib/constants/faq.ts`: FAQ_ITEMS — 5 perguntas e respostas — §6.5.
+- [x] `lib/constants/footer.ts`: FOOTER_LINKS (product, legal, contact, apps) — §6.7.
 
-**Deliverables:** Arquivos em `lib/constants/` e `types/landing.ts` com conteúdo completo; nenhuma alteração em componentes ainda.
+**Deliverables:** Arquivos em `lib/constants/` e `types/landing.ts` com conteúdo completo; AppScreenshotPlaceholder passou a importar AppScreenshotPlaceholderVariant de `types/landing`. Nenhuma alteração em componentes de seção.
 
-**Out of scope:** Implementar ou alterar componentes de UI; apenas dados e tipos.
+**Out of scope:** Implementar ou alterar componentes de UI de seção; apenas dados e tipos.
 
 ---
 
@@ -2253,7 +2253,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 |------|------|----------------------|
 | 1 ✅ | Foundation | Estrutura de pastas + design system (cores, fonte, CSS vars) — *done* |
 | 2 ✅ | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge — *done* |
-| 3 | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) |
+| 3 ✅ | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) — *done* |
 | 4 | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders |
 | 5 | Hero | HeroSection com headline, descrição, CTA, visual |
 | 6 | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards |
@@ -2284,7 +2284,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] `/components/shared/` for reusable components
 - [x] `/lib/constants/` for content
 - [x] `/lib/hooks/` for custom hooks
-- [ ] `/types/landing.ts` for TypeScript types (Phase 3)
+- [x] `/types/landing.ts` for TypeScript types (Phase 3)
 
 ### 12.3 Components
 - [x] Logo (Phase 2)
@@ -2302,12 +2302,12 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] Badge (Phase 2)
 
 ### 12.4 Content
-- [ ] Hero headline and description
-- [ ] 4 benefits with features
-- [ ] Free and Standard plans detailed
-- [ ] 5 FAQ items
-- [ ] CTA copy
-- [ ] Footer links
+- [x] Hero headline and description (Phase 3 — hero.ts)
+- [x] 4 benefits with features (Phase 3 — benefits.ts)
+- [x] Free and Standard plans detailed (Phase 3 — pricing.ts)
+- [x] 5 FAQ items (Phase 3 — faq.ts)
+- [ ] CTA copy (used in hero/pricing constants; final CTA in Phase 8)
+- [x] Footer links (Phase 3 — footer.ts)
 
 ### 12.5 Performance
 - [ ] Images optimized (WebP)
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–2 implemented; ready for Phase 3
+**Status**: 🚧 Phases 1–3 implemented; ready for Phase 4
