@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 📋 Planning Complete
+**Status:** 🚧 In progress — Phase 1 complete
 
 ---
 
@@ -1980,7 +1980,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 1 — Foundation (setup and design system)
+### Phase 1 — Foundation (setup and design system) ✅ *Completed 2026-02-07*
 
 **Goal:** Estrutura de pastas, tema dark, tipografia e tokens visuais prontos para os componentes.
 
@@ -1993,12 +1993,12 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - Tatame purple and dark theme: **§5.1 and §5.2**.
 
 **Tasks:**
-- [ ] Create folders: `app/(landing)/`, `components/landing/` (subfolders hero, benefits, pricing, faq, cta, navbar, footer), `components/shared/`, `lib/constants/`, `lib/hooks/`, `types/`, `public/images/`, `public/fonts/`.
-- [ ] Configure Bricolage Grotesque in the app layout (weights 400, 500, 600, 700).
-- [ ] Add to Tailwind/global CSS: `--purple-tatame: #A376FF`, dark theme variables (§5.1 and §5.2), radii and shadows (§5.5 and §5.6).
-- [ ] Ensure dark theme is default on the landing (or force dark in landing layout).
+- [x] Create folders: `app/(landing)/`, `components/landing/` (subfolders hero, benefits, pricing, faq, cta, navbar, footer), `components/shared/`, `lib/constants/`, `lib/hooks/`, `types/`, `public/images/` (logo, placeholders), `public/fonts/`.
+- [x] Configure Bricolage Grotesque in the landing layout (weights 400, 500, 600, 700) via `app/(landing)/layout.tsx`.
+- [x] Add to Tailwind/global CSS: `--purple-tatame: #A376FF`, `--purple-tatame-light`, `--purple-tatame-dark`; dark theme variables (§5.1 and §5.2); radii (`--radius-sm` to `--radius-xl`) and shadows (`--shadow-card`, `--shadow-card-lg`, `--shadow-cta`) (§5.5 and §5.6); Tailwind theme colors `purple-tatame`, `purple-tatame-light`, `purple-tatame-dark`.
+- [x] Ensure dark theme is default on the landing (forced `dark` class in `(landing)/layout.tsx`).
 
-**Deliverables:** Estrutura de pastas criada; variáveis CSS e fonte aplicadas; build e dev rodando sem erro. Nenhum componente de landing ainda.
+**Deliverables:** Estrutura de pastas criada; variáveis CSS e fonte aplicadas; build e dev rodando sem erro. Home (`/`) passou a ser servida por `app/(landing)/page.tsx` com layout mínimo; nenhum componente de landing além do placeholder de página.
 
 **Out of scope:** Logo, SectionContainer, seções, conteúdo. Não implementar componentes além do necessário para o layout raiz (ex.: layout do `(landing)` pode ser mínimo).
 
@@ -2251,7 +2251,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 | Phase | Name | Main deliverable |
 |------|------|----------------------|
-| 1 | Foundation | Estrutura de pastas + design system (cores, fonte, CSS vars) |
+| 1 ✅ | Foundation | Estrutura de pastas + design system (cores, fonte, CSS vars) — *done* |
 | 2 | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge |
 | 3 | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) |
 | 4 | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders |
@@ -2269,22 +2269,22 @@ This section defines **self-contained phases** so you can run **one at a time** 
 ## 12. Implementation Checklist
 
 ### 12.1 Design System
-- [ ] Bricolage Grotesque installed and configured
-- [ ] Purple #A376FF in Tailwind custom colors
-- [ ] CSS variables for dark theme configured
-- [ ] Type scale defined
+- [x] Bricolage Grotesque installed and configured (Phase 1 — landing layout)
+- [x] Purple #A376FF in Tailwind custom colors (`--purple-tatame`, `purple-tatame-light`, `purple-tatame-dark`)
+- [x] CSS variables for dark theme configured
+- [ ] Type scale defined (to be applied in sections)
 - [ ] 8px spacing system applied
-- [ ] Border radii standardized
-- [ ] Shadows defined
+- [x] Border radii standardized (`--radius-sm` to `--radius-xl`)
+- [x] Shadows defined (`--shadow-card`, `--shadow-card-lg`, `--shadow-cta`)
 - [ ] Animations configured
 
 ### 12.2 Directory Structure
-- [ ] `/app/(landing)/` created
-- [ ] `/components/landing/` organized by section
-- [ ] `/components/shared/` for reusable components
-- [ ] `/lib/constants/` for content
-- [ ] `/lib/hooks/` for custom hooks
-- [ ] `/types/landing.ts` for TypeScript types
+- [x] `/app/(landing)/` created (Phase 1)
+- [x] `/components/landing/` organized by section (hero, benefits, pricing, faq, cta, navbar, footer)
+- [x] `/components/shared/` for reusable components
+- [x] `/lib/constants/` for content
+- [x] `/lib/hooks/` for custom hooks
+- [ ] `/types/landing.ts` for TypeScript types (Phase 3)
 
 ### 12.3 Components
 - [ ] Logo
@@ -2552,4 +2552,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: ✅ Complete and ready for implementation
+**Status**: 🚧 Phase 1 implemented; ready for Phase 2
