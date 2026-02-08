@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1–8 complete
+**Status:** 🚧 In progress — Phases 1–9 complete
 
 ---
 
@@ -2165,7 +2165,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 9 — Animações e polish
+### Phase 9 — Animações e polish ✅ *Completed 2026-02-08*
 
 **Goal:** Animações sutis de entrada (scroll), navbar com blur no scroll, micro-interações em botões e smooth scroll para âncoras.
 
@@ -2174,13 +2174,21 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§5.7** (animações, durações, easing); **§9.2.6** (prefers-reduced-motion); **§6.1** (navbar blur).
 
 **Tasks:**
-- [ ] useInView: em Hero, Benefits, Pricing, FAQ, CTA Final — aplicar classe ou estado para fade-in + translateY ao entrar no viewport; stagger opcional em listas (ex.: benefícios).
-- [ ] Navbar: usar useScrollPosition; quando `isScrolled` for true, aplicar backdrop-blur e borda/background conforme §6.1.
-- [ ] Botões primários: hover com translateY(-1px) e sombra roxa (§5.7); transição 150ms.
-- [ ] Smooth scroll: links para #pricing e #faq com scroll suave (CSS scroll-behavior ou comportamento nativo).
-- [ ] Respeitar prefers-reduced-motion: reduzir ou desligar animações quando `prefers-reduced-motion: reduce` (§9.2.6).
+- [x] useInView: em Hero, Benefits, Pricing, FAQ, CTA Final — aplicar classe ou estado para fade-in + translateY ao entrar no viewport; stagger opcional em listas (ex.: benefícios).
+- [x] Navbar: usar useScrollPosition; quando `isScrolled` for true, aplicar backdrop-blur e borda/background conforme §6.1.
+- [x] Botões primários: hover com translateY(-1px) e sombra roxa (§5.7); transição 150ms.
+- [x] Smooth scroll: links para #pricing e #faq com scroll suave (CSS scroll-behavior ou comportamento nativo).
+- [x] Respeitar prefers-reduced-motion: reduzir ou desligar animações quando `prefers-reduced-motion: reduce` (§9.2.6).
 
 **Deliverables:** Página com animações leves e navbar reagindo ao scroll; sem quebra de layout ou acessibilidade.
+
+**Implemented:**
+- `AnimateOnView` component (`components/shared/animate-on-view.tsx`) using useInView, fade-in + translate on viewport entry, with optional stagger delay and direction (up/right).
+- `useReducedMotion` hook (`lib/hooks/use-reduced-motion.ts`) for accessibility.
+- Smooth scroll via `scroll-smooth` on html; `prefers-reduced-motion` media query in global CSS.
+- Entrance animations in Hero (content + visual from right), Benefits (staggered cards), Pricing (Standard first, Free second), FAQ, CTA Final.
+- Primary buttons: hover `-translate-y-px` and purple shadow (150ms).
+- Navbar blur on scroll (already implemented in Phase 4).
 
 **Out of scope:** Performance (imagens, bundle); SEO; analytics.
 
@@ -2259,7 +2267,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 6 ✅ | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards — *done* |
 | 7 ✅ | Pricing | PricingSection com Free e Standard — *done* |
 | 8 ✅ | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection — *done* |
-| 9 | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion |
+| 9 ✅ | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion — *done* |
 | 10 | Performance, a11y, SEO | Imagens, Lighthouse, a11y, metadata, JSON-LD, sitemap |
 | 11 | Analytics | GA4/GTM, trackEvent, eventos em CTAs |
 | 12 | Testes e deploy | Cross-browser, mobile, deploy, domínio, monitoramento |
@@ -2276,7 +2284,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [ ] 8px spacing system applied
 - [x] Border radii standardized (`--radius-sm` to `--radius-xl`)
 - [x] Shadows defined (`--shadow-card`, `--shadow-card-lg`, `--shadow-cta`)
-- [ ] Animations configured
+- [x] Animations configured (Phase 9)
 
 ### 12.2 Directory Structure
 - [x] `/app/(landing)/` created (Phase 1)
@@ -2323,7 +2331,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [ ] Semantic structure (headings)
 - [ ] Skip links added
 - [ ] Alt text on images
-- [ ] prefers-reduced-motion respected
+- [x] prefers-reduced-motion respected (Phase 9)
 
 ### 12.7 SEO
 - [ ] Metadata configured
@@ -2551,6 +2559,6 @@ For questions or suggestions about this plan:
 ---
 
 **Document created**: February 7, 2026  
-**Last updated**: February 7, 2026  
+**Last updated**: February 8, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–8 implemented; ready for Phase 9
+**Status**: 🚧 Phases 1–9 implemented; ready for Phase 10
