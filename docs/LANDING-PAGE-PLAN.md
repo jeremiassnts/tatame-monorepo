@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1, 2, 3 and 4 complete
+**Status:** 🚧 In progress — Phases 1, 2, 3, 4 and 5 complete
 
 ---
 
@@ -2080,7 +2080,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 5 — Hero
+### Phase 5 — Hero ✅ *Completed 2026-02-07*
 
 **Goal:** Seção Hero com headline, descrição, CTA e placeholder de screenshot; layout split (desktop) e empilhado (mobile).
 
@@ -2089,11 +2089,11 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§6.2** (Hero: layout, conteúdo, especificações, animações opcionais).
 
 **Tasks:**
-- [ ] `components/landing/hero/hero-section.tsx`: SectionContainer, grid 2 colunas no desktop, 1 no mobile; usar HERO_CONTENT de `lib/constants/hero.ts`.
-- [ ] `components/landing/hero/hero-content.tsx`: headline (H1), description, CTA primário (GradientButton).
-- [ ] `components/landing/hero/hero-visual.tsx`: AppScreenshotPlaceholder (variante adequada).
-- [ ] Em `page.tsx`, substituir o placeholder do Hero por `<HeroSection />`.
-- [ ] Responsividade: headline texto-4xl (mobile) → texto-6xl (desktop); padding py-16 (mobile) / py-24 (desktop).
+- [x] `components/landing/hero/hero-section.tsx`: SectionContainer, grid 2 colunas no desktop, 1 no mobile; usar HERO_CONTENT de `lib/constants/hero.ts`.
+- [x] `components/landing/hero/hero-content.tsx`: headline (H1), description, CTA primário (GradientButton).
+- [x] `components/landing/hero/hero-visual.tsx`: AppScreenshotPlaceholder (variante adequada).
+- [x] Em `page.tsx`, substituir o placeholder do Hero por `<HeroSection />`.
+- [x] Responsividade: headline texto-4xl (mobile) → texto-6xl (desktop); padding py-16 (mobile) / py-24 (desktop).
 
 **Deliverables:** Hero visível na página com copy correto e CTA clicável (ação pode ser link âncora ou # por enquanto).
 
@@ -2255,7 +2255,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 2 ✅ | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge — *done* |
 | 3 ✅ | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) — *done* |
 | 4 ✅ | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders — *done* |
-| 5 | Hero | HeroSection com headline, descrição, CTA, visual |
+| 5 ✅ | Hero | HeroSection com headline, descrição, CTA, visual — *done* |
 | 6 | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards |
 | 7 | Pricing | PricingSection com Free e Standard |
 | 8 | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection |
@@ -2289,7 +2289,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 ### 12.3 Components
 - [x] Logo (Phase 2)
 - [x] LandingNavbar
-- [ ] HeroSection
+- [x] HeroSection
 - [ ] BenefitsSection
 - [ ] PricingSection
 - [ ] FAQSection
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–4 implemented; ready for Phase 5
+**Status**: 🚧 Phases 1–5 implemented; ready for Phase 6

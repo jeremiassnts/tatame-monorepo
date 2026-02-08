@@ -5,6 +5,7 @@ export interface SectionContainerProps {
   className?: string;
   containerSize?: "default" | "narrow" | "wide";
   paddingY?: "sm" | "md" | "lg";
+  id?: string;
 }
 
 const containerSizeClasses = {
@@ -24,9 +25,10 @@ export function SectionContainer({
   className,
   containerSize = "default",
   paddingY = "md",
+  id,
 }: SectionContainerProps) {
   return (
-    <section className={cn(paddingYClasses[paddingY], className)}>
+    <section id={id} className={cn(paddingYClasses[paddingY], className)}>
       <div
         className={cn(
           "container mx-auto px-4 md:px-6 lg:px-8",
