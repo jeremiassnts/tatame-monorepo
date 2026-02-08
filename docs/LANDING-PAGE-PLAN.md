@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phase 1 complete
+**Status:** 🚧 In progress — Phases 1 and 2 complete
 
 ---
 
@@ -2004,7 +2004,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 2 — Componentes shared e hooks
+### Phase 2 — Componentes shared e hooks ✅ *Completed 2026-02-07*
 
 **Goal:** Logo, SectionContainer, placeholders, hooks e botão de CTA reutilizáveis prontos para as seções.
 
@@ -2016,16 +2016,16 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - **§8.3** (useInView, useScrollPosition).
 
 **Tasks:**
-- [ ] `components/shared/logo.tsx`: props `variant`, `size`, `className`; SVG inline ou asset; uso na navbar e footer.
-- [ ] `components/shared/section-container.tsx`: wrapper com `containerSize` (default/narrow/wide), `paddingY` (sm/md/lg); ver §8.1.3.
-- [ ] `components/shared/app-screenshot-placeholder.tsx`: variantes (ex.: financial, student-list, class-schedule, analytics); proporção ~9:19.5; opcional mockup de dispositivo.
-- [ ] `lib/hooks/use-in-view.ts`: IntersectionObserver, `threshold`, `triggerOnce`; retornar `ref` e `isInView`.
-- [ ] `lib/hooks/use-scroll-position.ts`: retornar `scrollY` e `isScrolled`.
-- [ ] `components/ui/gradient-button.tsx`: estender Button; variante primária roxa com gradiente e sombra (§8.2.1).
-- [ ] `FeatureList`: lista com ícone de check roxo; usar em benefícios e pricing (§8.2.2).
-- [ ] Badge “Mais popular” para pricing (§8.2.3): variante `popular` com `bg-[#A376FF]`.
+- [x] `components/shared/logo.tsx`: props `variant`, `size`, `className`; texto “Tatame” com fonte do layout (navbar e footer).
+- [x] `components/shared/section-container.tsx`: wrapper com `containerSize` (default/narrow/wide), `paddingY` (sm/md/lg); ver §8.1.3.
+- [x] `components/shared/app-screenshot-placeholder.tsx`: variantes financial, student-list, class-schedule, analytics; proporção ~9:19.5; opcional `showDevice` (mockup de dispositivo).
+- [x] `lib/hooks/use-in-view.ts`: IntersectionObserver, `threshold`, `triggerOnce`; retorna `ref` e `isInView`.
+- [x] `lib/hooks/use-scroll-position.ts`: retorna `scrollY` e `isScrolled` (threshold 10px para `isScrolled`).
+- [x] `components/ui/gradient-button.tsx`: estende Button; variantes `primary` (gradiente roxo + sombra) e `secondary` (§8.2.1).
+- [x] `components/ui/feature-list.tsx`: lista com ícone Check roxo; `items`, `iconColor`, `size` (sm/md) (§8.2.2).
+- [x] `components/ui/badge.tsx`: variantes `default`, `popular` (bg-[#A376FF]), `new` (§8.2.3).
 
-**Deliverables:** Arquivos acima implementados e exportados. Página da landing ainda pode ser um placeholder (sem seções de conteúdo).
+**Deliverables:** Todos os arquivos acima implementados e exportados. Página da landing permanece placeholder (sem seções de conteúdo).
 
 **Out of scope:** Conteúdo (constantes), navbar, footer, Hero, Benefits, Pricing, FAQ, CTA final.
 
@@ -2252,7 +2252,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | Phase | Name | Main deliverable |
 |------|------|----------------------|
 | 1 ✅ | Foundation | Estrutura de pastas + design system (cores, fonte, CSS vars) — *done* |
-| 2 | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge |
+| 2 ✅ | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge — *done* |
 | 3 | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) |
 | 4 | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders |
 | 5 | Hero | HeroSection com headline, descrição, CTA, visual |
@@ -2287,7 +2287,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [ ] `/types/landing.ts` for TypeScript types (Phase 3)
 
 ### 12.3 Components
-- [ ] Logo
+- [x] Logo (Phase 2)
 - [ ] LandingNavbar
 - [ ] HeroSection
 - [ ] BenefitsSection
@@ -2295,10 +2295,11 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [ ] FAQSection
 - [ ] CTAFinalSection
 - [ ] LandingFooter
-- [ ] AppScreenshotPlaceholder
-- [ ] SectionContainer
-- [ ] GradientButton
-- [ ] FeatureList
+- [x] AppScreenshotPlaceholder (Phase 2)
+- [x] SectionContainer (Phase 2)
+- [x] GradientButton (Phase 2)
+- [x] FeatureList (Phase 2)
+- [x] Badge (Phase 2)
 
 ### 12.4 Content
 - [ ] Hero headline and description
@@ -2552,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phase 1 implemented; ready for Phase 2
+**Status**: 🚧 Phases 1–2 implemented; ready for Phase 3
