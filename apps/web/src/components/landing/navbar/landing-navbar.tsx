@@ -11,6 +11,7 @@ export function LandingNavbar() {
 
   return (
     <header
+      role="banner"
       className={cn(
         "sticky top-0 z-50 border-b transition-all duration-200",
         "h-14 md:h-16",
@@ -19,10 +20,13 @@ export function LandingNavbar() {
           : "border-transparent bg-transparent"
       )}
     >
-      <div className="container mx-auto flex h-full items-center justify-between px-4">
+      <nav
+        className="container mx-auto flex h-full items-center justify-between px-4"
+        aria-label="Principal"
+      >
         <Logo size="md" />
         <NavbarCTA />
-      </div>
+      </nav>
     </header>
   );
 }

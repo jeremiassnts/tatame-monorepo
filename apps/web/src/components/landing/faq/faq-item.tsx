@@ -36,6 +36,7 @@ export function FAQItem({ item, isOpen, onToggle }: FAQItemProps) {
         id={answerId}
         role="region"
         aria-labelledby={`faq-question-${item.id}`}
+        hidden={!isOpen}
         className={cn(
           "grid transition-[grid-template-rows] duration-300 ease-in-out",
           isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"

@@ -11,7 +11,10 @@ export function LandingFooter() {
   const { apps } = FOOTER_LINKS;
 
   return (
-    <footer className="border-t border-border bg-card py-8 md:py-12">
+    <footer
+      role="contentinfo"
+      className="border-t border-border bg-card py-8 md:py-12"
+    >
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
