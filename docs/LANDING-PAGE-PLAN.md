@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1, 2, 3, 4, 5, 6 and 7 complete
+**Status:** 🚧 In progress — Phases 1–8 complete
 
 ---
 
@@ -2143,7 +2143,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 8 — FAQ e CTA final
+### Phase 8 — FAQ e CTA final ✅ *Completed 2026-02-07*
 
 **Goal:** Seção FAQ em accordion (uma pergunta aberta por vez) e seção CTA final com headline e botão principal.
 
@@ -2152,12 +2152,12 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§6.5** (FAQ), **§6.6** (CTAFinalSection).
 
 **Tasks:**
-- [ ] `components/landing/faq/faq-section.tsx`: título “Perguntas Frequentes”; id `faq`; max-w-3xl centralizado; estado “qual item aberto”; lista de FAQItem.
-- [ ] `components/landing/faq/faq-accordion.tsx` ou `faq-item.tsx`: botão com pergunta, aria-expanded e aria-controls; região com resposta; apenas um aberto por vez; chevron que gira ao abrir.
-- [ ] Dados: FAQ_ITEMS de `lib/constants/faq.ts`.
-- [ ] `components/landing/cta/cta-final-section.tsx`: headline e subheadline (§6.6), CTA “Assinar Standard - R$ 49,99/mês”, disclaimer “Sem compromisso. Cancele quando quiser.”; SectionContainer; fundo gradient sutil.
-- [ ] `components/landing/cta/cta-button.tsx` (opcional): apenas se quiser componente dedicado; senão usar GradientButton.
-- [ ] Em `page.tsx`, substituir placeholders de FAQ e CTA por `<FAQSection />` e `<CTAFinalSection />`.
+- [x] `components/landing/faq/faq-section.tsx`: título “Perguntas Frequentes”; id `faq`; max-w-3xl centralizado; estado “qual item aberto”; lista de FAQItem.
+- [x] `components/landing/faq/faq-accordion.tsx` ou `faq-item.tsx`: botão com pergunta, aria-expanded e aria-controls; região com resposta; apenas um aberto por vez; chevron que gira ao abrir.
+- [x] Dados: FAQ_ITEMS de `lib/constants/faq.ts`.
+- [x] `components/landing/cta/cta-final-section.tsx`: headline e subheadline (§6.6), CTA “Assinar Standard - R$ 49,99/mês”, disclaimer “Sem compromisso. Cancele quando quiser.”; SectionContainer; fundo gradient sutil.
+- [x] `components/landing/cta/cta-button.tsx` (opcional): apenas se quiser componente dedicado; senão usar GradientButton.
+- [x] Em `page.tsx`, substituir placeholders de FAQ e CTA por `<FAQSection />` e `<CTAFinalSection />`.
 
 **Deliverables:** FAQ expansível e CTA final visíveis; âncoras `#pricing` e `#faq` funcionando a partir da navbar/footer.
 
@@ -2258,7 +2258,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 5 ✅ | Hero | HeroSection com headline, descrição, CTA, visual — *done* |
 | 6 ✅ | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards — *done* |
 | 7 ✅ | Pricing | PricingSection com Free e Standard — *done* |
-| 8 | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection |
+| 8 ✅ | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection — *done* |
 | 9 | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion |
 | 10 | Performance, a11y, SEO | Imagens, Lighthouse, a11y, metadata, JSON-LD, sitemap |
 | 11 | Analytics | GA4/GTM, trackEvent, eventos em CTAs |
@@ -2292,8 +2292,8 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] HeroSection
 - [x] BenefitsSection
 - [x] PricingSection
-- [ ] FAQSection
-- [ ] CTAFinalSection
+- [x] FAQSection
+- [x] CTAFinalSection
 - [x] LandingFooter
 - [x] AppScreenshotPlaceholder (Phase 2)
 - [x] SectionContainer (Phase 2)
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–7 implemented; ready for Phase 8
+**Status**: 🚧 Phases 1–8 implemented; ready for Phase 9
