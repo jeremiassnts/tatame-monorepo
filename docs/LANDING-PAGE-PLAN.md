@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1, 2 and 3 complete
+**Status:** 🚧 In progress — Phases 1, 2, 3 and 4 complete
 
 ---
 
@@ -2055,7 +2055,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 4 — Layout da landing, navbar e footer
+### Phase 4 — Layout da landing, navbar e footer ✅ *Completed 2026-02-07*
 
 **Goal:** Rota `/` usando o route group `(landing)`, com layout, navbar fixa e footer; página com placeholders para as seções.
 
@@ -2067,12 +2067,12 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - **§6.7** (LandingFooter).
 
 **Tasks:**
-- [ ] `app/(landing)/layout.tsx`: layout específico da landing (fonte Bricolage, tema dark); sem duplicar root layout.
-- [ ] `app/(landing)/page.tsx`: importar e renderizar em ordem: LandingNavbar, depois placeholders (ou divs nomeados) para Hero, Benefits, Pricing, FAQ, CTA Final, e por fim LandingFooter.
-- [ ] `components/landing/navbar/landing-navbar.tsx`: sticky, altura 64px (desktop) / 56px (mobile), blur quando scroll > 0 (§6.1); Logo + NavbarCTA.
-- [ ] `components/landing/navbar/navbar-cta.tsx`: botão “Assine agora” (GradientButton ou primário roxo); mobile “Assinar”.
-- [ ] `components/landing/footer/landing-footer.tsx`: Logo, tagline, colunas Produto / Legal / Contato, links de `lib/constants/footer.ts`, botões App Store / Play Store, copyright — §6.7.
-- [ ] `components/landing/footer/footer-links.tsx` (ou equivalente): renderizar FOOTER_LINKS.
+- [x] `app/(landing)/layout.tsx`: layout específico da landing (fonte Bricolage, tema dark); sem duplicar root layout.
+- [x] `app/(landing)/page.tsx`: importar e renderizar em ordem: LandingNavbar, depois placeholders (ou divs nomeados) para Hero, Benefits, Pricing, FAQ, CTA Final, e por fim LandingFooter.
+- [x] `components/landing/navbar/landing-navbar.tsx`: sticky, altura 64px (desktop) / 56px (mobile), blur quando scroll > 0 (§6.1); Logo + NavbarCTA.
+- [x] `components/landing/navbar/navbar-cta.tsx`: botão “Assine agora” (GradientButton ou primário roxo); mobile “Assinar”.
+- [x] `components/landing/footer/landing-footer.tsx`: Logo, tagline, colunas Produto / Legal / Contato, links de `lib/constants/footer.ts`, botões App Store / Play Store, copyright — §6.7.
+- [x] `components/landing/footer/footer-links.tsx` (ou equivalente): renderizar FOOTER_LINKS.
 
 **Deliverables:** Ao acessar `/`, página com navbar no topo, blocos vazios/nomeados no meio e footer completo. Links do footer podem apontar para `#pricing`, `#faq`, `/terms`, `/privacy` e URLs de app stores.
 
@@ -2254,7 +2254,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 1 ✅ | Foundation | Estrutura de pastas + design system (cores, fonte, CSS vars) — *done* |
 | 2 ✅ | Shared + hooks | Logo, SectionContainer, AppScreenshotPlaceholder, useInView, useScrollPosition, GradientButton, FeatureList, Badge — *done* |
 | 3 ✅ | Conteúdo | types/landing.ts + lib/constants (hero, benefits, pricing, faq, footer) — *done* |
-| 4 | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders |
+| 4 ✅ | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders — *done* |
 | 5 | Hero | HeroSection com headline, descrição, CTA, visual |
 | 6 | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards |
 | 7 | Pricing | PricingSection com Free e Standard |
@@ -2288,13 +2288,13 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ### 12.3 Components
 - [x] Logo (Phase 2)
-- [ ] LandingNavbar
+- [x] LandingNavbar
 - [ ] HeroSection
 - [ ] BenefitsSection
 - [ ] PricingSection
 - [ ] FAQSection
 - [ ] CTAFinalSection
-- [ ] LandingFooter
+- [x] LandingFooter
 - [x] AppScreenshotPlaceholder (Phase 2)
 - [x] SectionContainer (Phase 2)
 - [x] GradientButton (Phase 2)
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–3 implemented; ready for Phase 4
+**Status**: 🚧 Phases 1–4 implemented; ready for Phase 5
