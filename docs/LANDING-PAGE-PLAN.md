@@ -4,7 +4,7 @@
 **Project:** Tatame Landing Page  
 **Version:** 1.0  
 **Date:** February 7, 2026  
-**Status:** 🚧 In progress — Phases 1, 2, 3, 4, 5 and 6 complete
+**Status:** 🚧 In progress — Phases 1, 2, 3, 4, 5, 6 and 7 complete
 
 ---
 
@@ -2122,7 +2122,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 
 ---
 
-### Phase 7 — Pricing
+### Phase 7 — Pricing ✅ *Completed 2026-02-07*
 
 **Goal:** Seção de preços com dois cards (Free e Standard); Standard destacado (borda roxa, badge “Mais popular”).
 
@@ -2131,11 +2131,11 @@ This section defines **self-contained phases** so you can run **one at a time** 
 **Scope (references):** **§6.4** (layout, especificações dos cards, ordem mobile: Standard primeiro).
 
 **Tasks:**
-- [ ] `components/landing/pricing/pricing-section.tsx`: título “Escolha o plano ideal”; grid de PricingCard; SectionContainer; id `pricing` para âncora.
-- [ ] `components/landing/pricing/pricing-card.tsx`: recebe plan de PRICING_PLANS; card com nome, tagline, preço, interval, FeatureList, CTA; se highlighted: borda roxa, sombra, scale leve no desktop, badge.
-- [ ] `components/landing/pricing/pricing-badge.tsx`: badge “Mais popular” (ou usar Badge da UI); posicionamento no topo do card Standard.
-- [ ] Mobile: ordem Standard depois Free; desktop: lado a lado.
-- [ ] Em `page.tsx`, substituir placeholder de Pricing por `<PricingSection />`.
+- [x] `components/landing/pricing/pricing-section.tsx`: título “Escolha o plano ideal”; grid de PricingCard; SectionContainer; id `pricing` para âncora.
+- [x] `components/landing/pricing/pricing-card.tsx`: recebe plan de PRICING_PLANS; card com nome, tagline, preço, interval, FeatureList, CTA; se highlighted: borda roxa, sombra, scale leve no desktop, badge.
+- [x] `components/landing/pricing/pricing-badge.tsx`: badge “Mais popular” (ou usar Badge da UI); posicionamento no topo do card Standard.
+- [x] Mobile: ordem Standard depois Free; desktop: lado a lado.
+- [x] Em `page.tsx`, substituir placeholder de Pricing por `<PricingSection />`.
 
 **Deliverables:** Seção Pricing com Free e Standard; botões “Começar grátis” e “Assinar agora” (links podem ser # ou âncora por enquanto).
 
@@ -2257,7 +2257,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 | 4 ✅ | Layout + Navbar + Footer | Route group (landing), layout, LandingNavbar, LandingFooter, page com placeholders — *done* |
 | 5 ✅ | Hero | HeroSection com headline, descrição, CTA, visual — *done* |
 | 6 ✅ | Benefícios | BenefitsSection com layout zig-zag e 4 benefit cards — *done* |
-| 7 | Pricing | PricingSection com Free e Standard |
+| 7 ✅ | Pricing | PricingSection com Free e Standard — *done* |
 | 8 | FAQ + CTA final | FAQSection (accordion) + CTAFinalSection |
 | 9 | Animações e polish | useInView, navbar blur, hover em botões, smooth scroll, reduced-motion |
 | 10 | Performance, a11y, SEO | Imagens, Lighthouse, a11y, metadata, JSON-LD, sitemap |
@@ -2291,7 +2291,7 @@ This section defines **self-contained phases** so you can run **one at a time** 
 - [x] LandingNavbar
 - [x] HeroSection
 - [x] BenefitsSection
-- [ ] PricingSection
+- [x] PricingSection
 - [ ] FAQSection
 - [ ] CTAFinalSection
 - [x] LandingFooter
@@ -2553,4 +2553,4 @@ For questions or suggestions about this plan:
 **Document created**: February 7, 2026  
 **Last updated**: February 7, 2026  
 **Version**: 1.0  
-**Status**: 🚧 Phases 1–6 implemented; ready for Phase 7
+**Status**: 🚧 Phases 1–7 implemented; ready for Phase 8
