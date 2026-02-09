@@ -1,5 +1,6 @@
-import type { AppScreenshotPlaceholderVariant } from "@/types/landing";
 import { cn } from "@/lib/utils";
+import type { AppScreenshotPlaceholderVariant } from "@/types/landing";
+import Image from "next/image";
 
 export type { AppScreenshotPlaceholderVariant };
 
@@ -7,6 +8,7 @@ export interface AppScreenshotPlaceholderProps {
   variant: AppScreenshotPlaceholderVariant;
   className?: string;
   showDevice?: boolean;
+  imageSrc?: string;
 }
 
 const variantLabels: Record<AppScreenshotPlaceholderVariant, string> = {
@@ -23,6 +25,7 @@ export function AppScreenshotPlaceholder({
   variant,
   className,
   showDevice = false,
+  imageSrc,
 }: AppScreenshotPlaceholderProps) {
   const content = (
     <div
@@ -40,9 +43,10 @@ export function AppScreenshotPlaceholder({
           <div className="h-2 w-2/3 mx-auto rounded bg-muted/50 mt-4" />
           <div className="h-2 w-full mx-auto rounded bg-muted/40" />
           <div className="h-2 w-5/6 mx-auto rounded bg-muted/40" />
-          <p className="text-xs text-muted-foreground pt-4">
+          {imageSrc && <Image src={imageSrc} alt="App Screenshot" layout="fill" className="rounded-[2rem]" />}
+          {!imageSrc && <p className="text-xs text-muted-foreground pt-4">
             {variantLabels[variant]}
-          </p>
+          </p>}
         </div>
       </div>
     </div>

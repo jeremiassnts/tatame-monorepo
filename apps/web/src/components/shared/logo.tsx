@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export interface LogoProps {
   variant?: "default" | "minimal";
@@ -14,15 +15,18 @@ const sizeClasses = {
 
 export function Logo({ variant = "default", size = "md", className }: LogoProps) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center font-bold tracking-tight text-foreground",
-        sizeClasses[size],
-        className
-      )}
-      aria-label="Tatame"
-    >
-      Tatame
-    </span>
+    <div className="flex items-center gap-3 justify-start">
+      <Image src="/images/logo/logo.webp" alt="Tatame" width={22} height={22} />
+      <span
+        className={cn(
+          "inline-flex items-center font-bold tracking-tight text-foreground",
+          sizeClasses[size],
+          className
+        )}
+        aria-label="Tatame"
+      >
+        TATAME
+      </span>
+    </div>
   );
 }

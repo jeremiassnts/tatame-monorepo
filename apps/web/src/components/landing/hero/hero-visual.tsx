@@ -10,6 +10,7 @@ export function HeroVisual() {
         variant="financial"
         className="max-w-[280px] md:max-w-[320px]"
         showDevice
+        imageSrc="/images/screens/image 1.png"
       />
     </div>
   );

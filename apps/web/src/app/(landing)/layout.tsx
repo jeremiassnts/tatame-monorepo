@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
 import { GoogleAnalytics } from "@/components/landing/google-analytics";
 import { StructuredData } from "@/components/landing/structured-data";
 
-const bricolageGrotesque = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
@@ -71,7 +71,7 @@ export default function LandingLayout({
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   return (
-    <div className={`${bricolageGrotesque.className} dark`}>
+    <div className={`${montserrat.className} dark`}>
       {gaId && <GoogleAnalytics gaId={gaId} />}
       <StructuredData />
       {children}

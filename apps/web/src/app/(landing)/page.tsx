@@ -1,10 +1,10 @@
-import { HeroSection } from "@/components/landing/hero/hero-section";
 import { BenefitsSection } from "@/components/landing/benefits/benefits-section";
-import { PricingSection } from "@/components/landing/pricing/pricing-section";
-import { FAQSection } from "@/components/landing/faq/faq-section";
 import { CTAFinalSection } from "@/components/landing/cta/cta-final-section";
-import { LandingNavbar } from "@/components/landing/navbar/landing-navbar";
+import { FAQSection } from "@/components/landing/faq/faq-section";
 import { LandingFooter } from "@/components/landing/footer/landing-footer";
+import { HeroSection } from "@/components/landing/hero/hero-section";
+import { LandingNavbar } from "@/components/landing/navbar/landing-navbar";
+import { PricingSection } from "@/components/landing/pricing/pricing-section";
 import { ScrollDepthTracker } from "@/components/landing/scroll-depth-tracker";
 
 export default function LandingPage() {
@@ -18,19 +18,13 @@ export default function LandingPage() {
         Pular para conteúdo principal
       </a>
       <LandingNavbar />
-
       <main id="main-content" role="main">
         <HeroSection />
-
         <BenefitsSection />
-
         <PricingSection />
-
         <FAQSection />
-
         <CTAFinalSection />
       </main>
-
       <LandingFooter />
     </div>
   );
