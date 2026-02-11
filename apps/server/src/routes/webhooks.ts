@@ -13,6 +13,9 @@ webhooksRouter.post("/stripe", async (req, res, next) => {
             case "customer.subscription.trial_will_end":
                 await stripeWebhooksService.handleSubscriptionTrialWillEnd(data);
                 break;
+            case "customer.subscription.deleted":
+                await stripeWebhooksService.handleSubscriptionDeleted(data);
+                break;
             case "invoice.paid":
                 await stripeWebhooksService.handleInvoicePaid(data);
                 break;

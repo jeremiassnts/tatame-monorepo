@@ -22,4 +22,21 @@ export class ResendService {
             to
         })
     }
+    /**
+     * Send an email with default template
+     */
+    async sendEmail(to: string, subject: string, title: string, content: string) {
+        await this.resend.emails.send({
+            template: {
+                id: "basic-communication",
+                variables: {
+                    "SUBJECT": subject,
+                    "TITLE": title,
+                    "CONTENT": content
+                }
+            },
+            to,
+            subject,
+        })
+    }
 }

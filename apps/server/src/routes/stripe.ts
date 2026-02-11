@@ -76,6 +76,19 @@ stripeRouter.post("/subscriptions", async (req, res, next) => {
   }
 });
 
+stripeRouter.get("/subscriptions/:subscriptionId", async (req, res, next) => {
+  try {
+    const subscriptionId = req.params.subscriptionId;
+    // Find subscription by subscriptionId
+    const subscription = await stripeService.getSubscription(subscriptionId);
+    res.status(200).json({
+      data: subscription,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 stripeRouter.get("/subscriptions/customer/:customerId", async (req, res, next) => {
   try {
     const customerId = req.params.customerId;
@@ -83,6 +96,20 @@ stripeRouter.get("/subscriptions/customer/:customerId", async (req, res, next) =
     const subscription = await stripeService.getSubscriptionByCustomerId(customerId);
     res.status(200).json({
       data: subscription,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+stripeRouter.delete("/subscriptions/:subscriptionId", async (req, res, next) => {
+  try {
+    const subscriptionId = req.params.subscriptionId;
+    // Cancel subscription by subscriptionId
+    const subscription = await stripeService.cancelSubscription(subscriptionId);
+    res.status(200).json({
+      data: subscription,
+      deleted: true,
     });
   } catch (error) {
     next(error);

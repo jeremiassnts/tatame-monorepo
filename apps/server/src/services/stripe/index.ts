@@ -65,12 +65,17 @@ export const stripeService = {
    * Create a new Stripe subscription
    */
   async createSubscription(params: CreateSubscriptionParams) {
+    //check if customer already had a subscription
+    const subscriptions = (await stripe.subscriptions.list({
+      status: 'all',
+      customer: params.customerId
+    }))
     return await stripe.subscriptions.create({
       customer: params.customerId,
       items: [{ price: params.priceId }],
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent'],
-      trial_period_days: 30
+      trial_period_days: subscriptions.data.length > 0 ? 0 : 30
     });
   },
   /**
@@ -87,6 +92,12 @@ export const stripeService = {
    */
   async getSubscription(subscriptionId: string) {
     return await stripe.subscriptions.retrieve(subscriptionId);
+  },
+  /**
+   * Cancel a Stripe subscription by ID
+   */
+  async cancelSubscription(subscriptionId: string) {
+    return await stripe.subscriptions.cancel(subscriptionId);
   },
   /** 
    * Create a new Stripe payment intent
