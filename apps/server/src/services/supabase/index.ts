@@ -8,16 +8,8 @@ export class SupabaseService {
       accessToken: async () => accessToken,
     });
   }
-  /**
- * Update user
- */
-  async updateUser(data: Record<string, unknown>) {
-    const { error } = await this.supabase
-      .from("users")
-      .update(data)
-      .eq("id", data.id);
-    if (error) {
-      throw error;
-    }
+
+  getClient() {
+    return this.supabase;
   }
 }
