@@ -12,11 +12,11 @@ This document outlines the complete migration strategy from Supabase (PostgreSQL
 
 ### Key Goals
 
-- **Zero Downtime**: Migrate without service interruption
 - **Data Integrity**: Ensure all data is preserved and validated
 - **Incremental Approach**: Migrate one table/service at a time
 - **Type Safety**: Leverage Drizzle ORM for type-safe database operations
 - **Rollback Ready**: Each step should be reversible
+- **Acceptable Downtime**: Project not fully published, can handle service interruption during migration
 
 ### Migration Scope
 
@@ -99,11 +99,11 @@ Phase 0: Foundation Setup (1-2 days)
 
 ### Migration Principles
 
-1. **Dual-Write Pattern**: During transition, write to both databases temporarily
-2. **Read-First Migration**: Switch reads before switching writes
-3. **Service-by-Service**: Complete one service entirely before moving to the next
-4. **Data Validation**: Verify data consistency at each step
-5. **Feature Flags**: Use environment variables to control which database is active
+1. **Service-by-Service**: Complete one service entirely before moving to the next
+2. **Data Validation**: Verify data consistency at each step
+3. **Simplified Approach**: Since downtime is acceptable, no need for complex dual-write patterns
+4. **Feature Flags**: Use environment variables to control which database is active during testing
+5. **Manual Data Migration**: Export from Supabase, import to Postgres with validation
 
 ---
 
@@ -351,20 +351,20 @@ app_stores (standalone)
 
 | Area | Risk Level | Mitigation Strategy |
 |------|------------|---------------------|
-| Users table migration | **HIGH** | Dual-write, extensive testing, rollback plan |
+| Users table migration | **HIGH** | Extensive testing, rollback plan, data validation |
 | Date/time calculations | **HIGH** | Comprehensive test suite, timezone validation |
 | Foreign key relationships | **MEDIUM** | Migration order, constraint validation |
 | Array columns | **MEDIUM** | Drizzle array column types, data validation |
 | Clerk integration | **MEDIUM** | Keep clerk_user_id as source of truth |
-| Production downtime | **LOW** | Blue-green deployment strategy |
+| Production downtime | **LOW** | Acceptable - project not fully published |
 
 ### Data Loss Prevention
 
-1. **Backup Strategy**: Full database backup before each phase
+1. **Backup Strategy**: Export full data from Supabase before migration (can delete Supabase after)
 2. **Validation Scripts**: SQL queries to compare row counts and data
-3. **Dual-Write Period**: Minimum 3 days per critical table
-4. **Rollback Procedures**: Documented rollback for each phase
-5. **Monitoring**: Real-time alerts for data inconsistencies
+3. **Testing Period**: Validate in local/staging environment before production
+4. **Rollback Procedures**: Keep Supabase export as fallback
+5. **Monitoring**: Real-time alerts for data inconsistencies post-migration
 
 ---
 
@@ -399,9 +399,9 @@ app_stores (standalone)
 
 Each phase has a rollback procedure:
 
-1. **Stop writes** to Postgres for affected tables
-2. **Revert service code** to Supabase version
-3. **Sync any missed data** from Postgres back to Supabase (if dual-write)
+1. **Stop the server** temporarily (downtime is acceptable)
+2. **Restore from Supabase export** if needed
+3. **Revert service code** to Supabase version
 4. **Validate** Supabase data is current
 5. **Resume operations** on Supabase
 6. **Document issues** for retry
@@ -411,13 +411,15 @@ Each phase has a rollback procedure:
 If critical issues arise in production:
 
 1. **Immediate**: Switch environment variable to use Supabase
-2. **Fast**: Deploy previous version of services
-3. **Full**: Restore Supabase from backup if needed
+2. **Fast**: Restore from Supabase export if needed
+3. **Full**: Redeploy previous version of services
 4. **Analysis**: Root cause analysis before retry
+
+**Note:** Since the project is not fully published and downtime is acceptable, rollback can be simpler and more direct.
 
 ---
 
-## 9. Environment Variables
+## 9. Environment Variables & Hosting
 
 ### Current (Supabase)
 
@@ -432,10 +434,18 @@ SUPABASE_ANON_KEY=your-anon-key
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
+**Hosting Solution:** VPS with Coolify for deployment and management. This provides:
+- Easy deployment workflow
+- Database management
+- Environment variable management
+- Monitoring capabilities
+
+**Future Considerations:** If performance or scaling becomes an issue, can evaluate managed Postgres solutions (RDS, DigitalOcean Managed DB, etc.)
+
 ### Transition Period
 
 ```bash
-# Both databases active during migration
+# Both databases active during migration testing
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 DATABASE_URL=postgresql://user:password@host:port/database
@@ -534,19 +544,23 @@ This migration plan consists of multiple documents:
 
 ## 14. Questions & Decisions Log
 
-### Open Questions
+### Resolved Questions
 
 1. **Q:** Should we keep Supabase tables as backup during transition?
-   **A:** TBD - Recommend yes for 30 days post-cutover
+   **A:** ✅ No - Project not fully published, can handle downtime. Supabase will be deleted after migration.
 
 2. **Q:** How to handle the gym/user circular dependency?
-   **A:** Migrate gyms first with nullable managerId, update after users migration
+   **A:** ✅ Make managerId nullable, migrate gyms first, manually insert gyms before users migration.
 
 3. **Q:** Should stripe tables stay in Supabase or migrate?
-   **A:** Migrate - they're small and should be in same DB as users
+   **A:** ✅ No stripe tables needed - Stripe integration is already managed in the users table, not separate tables.
 
-4. **Q:** Performance expectations vs Supabase?
-   **A:** TBD - Establish baseline metrics first
+4. **Q:** What hosting solution for production Postgres?
+   **A:** ✅ VPS with Coolify initially, evaluate if scaling becomes an issue later.
+
+### Open Questions
+
+None at this time.
 
 ### Decisions Made
 
