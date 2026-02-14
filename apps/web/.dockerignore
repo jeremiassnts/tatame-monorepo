@@ -1,0 +1,10 @@
+node_modules
+.next
+.turbo
+.env
+.env.*
+*.log
+.git
+.gitignore
+README.md
+tsconfig.json

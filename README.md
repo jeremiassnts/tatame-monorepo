@@ -123,9 +123,45 @@ tatame-monorepo/
 
 ## Documentation
 
-For detailed backend architecture and implementation plans, see:
+For detailed documentation, see:
 
+### Backend
 - [Backend Development Roadmap](./docs/backend/00-backend-development-roadmap.md)
 - [Architecture Overview](./docs/backend/01-architecture-overview-and-findings.md)
 - [API Design](./docs/backend/03-api-design.md)
 - [Security Best Practices](./docs/backend/05-security-and-best-practices.md)
+
+### Database Migration
+- [Supabase to PostgreSQL Migration Plan](./docs/postgres-migration/00-migration-overview.md)
+- [Phase 0: Foundation Setup](./docs/postgres-migration/01-phase-0-foundation.md)
+
+### Deployment
+- **[Docker Deployment Guide](./DOCKER.md)** - Container setup and local testing
+- **[Coolify Deployment Guide](./COOLIFY.md)** - Production deployment with Coolify
+
+## Deployment
+
+This project is containerized and ready for production deployment. Each service runs in its own Docker container:
+
+- **Database**: PostgreSQL 16
+- **Server**: Express API (Node.js)
+- **Web**: Next.js frontend
+
+### Quick Deploy with Coolify
+
+1. Create PostgreSQL database in Coolify
+2. Deploy server from `apps/server/Dockerfile`
+3. Deploy web from `apps/web/Dockerfile`
+4. Configure environment variables
+5. Run database migrations
+
+See [COOLIFY.md](./COOLIFY.md) for detailed deployment instructions.
+
+### Local Docker Testing
+
+```bash
+# Run all services with Docker Compose
+docker-compose -f docker-compose.prod.yml up --build
+```
+
+See [DOCKER.md](./DOCKER.md) for complete Docker documentation.
