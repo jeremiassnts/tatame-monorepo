@@ -1,36 +1,40 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseService } from "../supabase";
+import { db } from "@tatame-monorepo/db";
+import { users } from "@tatame-monorepo/db/schema";
+import { eq } from "drizzle-orm";
 
 export class RolesService {
-    private supabase: SupabaseClient;
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
+        // Access token kept for backward compatibility but not needed for Drizzle
     }
+
     /*
     Get a role by user id
     */
     async getRoleByUserId(userId: number) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("id", userId);
-        if (error) {
-            throw error;
+        const user = await db.query.users.findFirst({
+            where: eq(users.id, userId),
+            columns: { role: true },
+        });
+        
+        if (!user) {
+            throw new Error(`User with id ${userId} not found`);
         }
-        return data[0].role;
-    };
+        
+        return user.role;
+    }
+
     /*
     Check the levels of the role
     */
     isHigherRole(role: string) {
         return role === "MANAGER";
-    };
+    }
 
     isMediumRole(role: string) {
         return role === "INSTRUCTOR" || role === "MANAGER";
-    };
+    }
 
     isLowerRole(role: string) {
         return role === "STUDENT";
-    };
+    }
 }

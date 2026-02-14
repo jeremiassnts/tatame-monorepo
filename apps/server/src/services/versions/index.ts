@@ -1,21 +1,22 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseService } from "../supabase";
+import { db } from "@tatame-monorepo/db";
+import { versions } from "@tatame-monorepo/db/schema";
+import { isNull, desc } from "drizzle-orm";
 
 export class VersionsService {
-    private supabase: SupabaseClient;
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
+        // Access token kept for backward compatibility but not needed for Drizzle
     }
 
     async get() {
-        const { data, error } = await this.supabase.from("versions")
-            .select("*")
-            .is("disabled_at", null)
-            .limit(1);
+        const version = await db.query.versions.findFirst({
+            where: isNull(versions.disabledAt),
+            orderBy: desc(versions.id),
+        });
 
-        if (error) {
-            throw error;
+        if (!version) {
+            throw new Error("No active version found");
         }
-        return data[0];
+
+        return version;
     }
 }

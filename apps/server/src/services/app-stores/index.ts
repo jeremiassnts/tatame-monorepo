@@ -1,23 +1,17 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { SupabaseService } from "../supabase";
+import { db } from "@tatame-monorepo/db";
+import { appStores } from "@tatame-monorepo/db/schema";
+import { isNull } from "drizzle-orm";
 
 export class AppStoresService {
-    private supabase: SupabaseClient;
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
+        // Access token kept for backward compatibility but not needed for Drizzle
     }
+
     /**
      * Get app stores
      */
     async list() {
-        const { data, error } = await this.supabase
-            .from("app_stores")
-            .select("*")
-            .is("disabled_at", null);
-
-        if (error) {
-            throw error;
-        }
-        return data;
+        return await db.select().from(appStores)
+            .where(isNull(appStores.disabledAt));
     }
 }
