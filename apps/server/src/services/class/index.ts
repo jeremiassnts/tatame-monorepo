@@ -1,16 +1,18 @@
-import { addDays, format, isBefore, set } from "date-fns";
 import { db } from "@tatame-monorepo/db";
-import { classTable, users, gyms, assets } from "@tatame-monorepo/db/schema";
-import { eq, and, isNull, lte, gte } from "drizzle-orm";
+import { assets, classTable, gyms, users } from "@tatame-monorepo/db/schema";
+import { addDays, format, isBefore, set } from "date-fns";
+import { and, eq, gte, isNull, lte } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 
+/** Service for class schedule CRUD, next-class calculation, and check-in lookup. */
 export class ClassService {
     private notificationsService: NotificationsService;
 
-    constructor(accessToken: string) {
-        this.notificationsService = new NotificationsService(accessToken);
+    constructor() {
+        this.notificationsService = new NotificationsService();
     }
 
+    /** Returns the next upcoming class for the gym (by day and start time), with instructor name and assets. */
     async nextClass(gymId: number) {
         const data = await db
             .select()
@@ -116,6 +118,7 @@ export class ClassService {
         };
     }
 
+    /** Creates a class and notifies approved students of the gym. */
     async create(classData: {
         gym_id: number;
         instructor_id: number | null;
@@ -169,6 +172,7 @@ export class ClassService {
         return created;
     }
 
+    /** Lists all non-deleted classes for the gym with gym, instructor, and assets. */
     async list(gymId: number) {
         const data = await db
             .select()
@@ -247,6 +251,7 @@ export class ClassService {
         });
     }
 
+    /** Returns a single class by id with instructor, gym, and assets, or null if not found. */
     async get(classId: number) {
         const data = await db
             .select()
@@ -313,8 +318,8 @@ export class ClassService {
         }
 
         const cls = Array.from(classMap.values())[0];
-        const instructor_name = cls.instructor
-            ? `${cls.instructor.firstName ?? ""} ${cls.instructor.lastName ?? ""}`.trim()
+        const instructor_name = cls?.instructor
+            ? `${cls?.instructor.firstName ?? ""} ${cls?.instructor.lastName ?? ""}`.trim()
             : "";
 
         return {
@@ -323,6 +328,7 @@ export class ClassService {
         };
     }
 
+    /** Updates class fields by id (instructor_id, day, start, end, description). */
     async edit(data: {
         id: number;
         instructor_id?: number;
@@ -345,6 +351,7 @@ export class ClassService {
         return data;
     }
 
+    /** Soft-deletes a class by setting deletedAt. */
     async delete(classId: number) {
         await db
             .update(classTable)
@@ -352,6 +359,7 @@ export class ClassService {
             .where(eq(classTable.id, classId));
     }
 
+    /** Returns the class that is currently in progress for the gym at the given day and time (start <= time <= end). */
     async getToCheckIn(gymId: number, time: string, day: string) {
         const [result] = await db
             .select()

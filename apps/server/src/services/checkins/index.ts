@@ -1,16 +1,13 @@
-import { subDays } from "date-fns";
 import { db } from "@tatame-monorepo/db";
-import { checkins, users, classTable } from "@tatame-monorepo/db/schema";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { checkins, classTable, users } from "@tatame-monorepo/db/schema";
+import { subDays } from "date-fns";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 
+/** Service for attendance check-ins by class and user. */
 export class CheckinsService {
-    constructor(accessToken: string) {
-        // Access token kept for backward compatibility but not needed for Drizzle
-    }
+    constructor() { }
 
-    /**
-     * Create a checkin
-     */
+    /** Creates a check-in for the given class and user (today). No-op if one already exists. */
     async create(checkin: { classId: number | null; userId: number | null; date?: string | null }) {
         if (!checkin.classId || !checkin.userId) return;
 
@@ -35,9 +32,7 @@ export class CheckinsService {
         });
     }
 
-    /**
-     * Delete a checkin
-     */
+    /** Deletes a check-in by id and returns the deleted row(s). */
     async delete(checkinId: number) {
         const deleted = await db
             .delete(checkins)
@@ -46,11 +41,9 @@ export class CheckinsService {
         return deleted;
     }
 
-    /**
-     * List checkins by user id (for today)
-     */
+    /** Lists check-ins for the user for today. */
     async listByUserId(userId: number) {
-        const today = new Date().toISOString().split("T")[0];
+        const today: string = new Date().toISOString().slice(0, 10);
         return await db
             .select()
             .from(checkins)
@@ -62,11 +55,9 @@ export class CheckinsService {
             );
     }
 
-    /**
-     * List checkins by class id and user id (for today)
-     */
+    /** Lists check-ins for the given class and user for today. */
     async listByClassIdAndUserId(classId: number, userId: number) {
-        const today = new Date().toISOString().split("T")[0];
+        const today: string = new Date().toISOString().slice(0, 10);
         return await db
             .select()
             .from(checkins)
@@ -79,12 +70,10 @@ export class CheckinsService {
             );
     }
 
-    /**
-     * List last checkins by user id (last 15 days)
-     */
+    /** Lists check-ins for the user in the last 15 days. */
     async listLastCheckinsByUserId(userId: number) {
-        const fromDate = subDays(new Date(), 15).toISOString().split("T")[0];
-        const toDate = new Date().toISOString().split("T")[0];
+        const fromDate: string = subDays(new Date(), 15).toISOString().slice(0, 10);
+        const toDate: string = new Date().toISOString().slice(0, 10);
 
         return await db
             .select()
@@ -98,11 +87,9 @@ export class CheckinsService {
             );
     }
 
-    /**
-     * List checkins by class id (for today, with user details)
-     */
+    /** Lists today's check-ins for the class with user name and profile picture. */
     async listByClassId(classId: number) {
-        const today = new Date().toISOString().split("T")[0];
+        const today: string = new Date().toISOString().slice(0, 10);
 
         const data = await db
             .select({
@@ -127,12 +114,10 @@ export class CheckinsService {
         }));
     }
 
-    /**
-     * List last month checkins by user id
-     */
+    /** Lists the user's check-ins in the last 30 days with class start, end, and day. */
     async listLastMonthCheckinsByUserId(userId: number) {
-        const fromDate = subDays(new Date(), 30).toISOString().split("T")[0];
-        const toDate = new Date().toISOString().split("T")[0];
+        const fromDate: string = subDays(new Date(), 30).toISOString().slice(0, 10);
+        const toDate: string = new Date().toISOString().slice(0, 10);
 
         const data = await db
             .select({

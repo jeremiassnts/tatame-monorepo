@@ -1,21 +1,22 @@
 import { db } from "@tatame-monorepo/db";
 import { gyms, users } from "@tatame-monorepo/db/schema";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
 
+/** Service for gym CRUD and user–gym association. */
 type NewGym = typeof gyms.$inferInsert;
 type Gym = typeof gyms.$inferSelect;
 
 export class GymsService {
     private rolesService: RolesService;
     private notificationsService: NotificationsService;
-    
-    constructor(accessToken: string) {
-        this.rolesService = new RolesService(accessToken);
-        this.notificationsService = new NotificationsService(accessToken);
+
+    constructor() {
+        this.rolesService = new RolesService();
+        this.notificationsService = new NotificationsService();
     }
-    
+
     /**
      * Create a gym and associate it with the user
      */
@@ -24,39 +25,36 @@ export class GymsService {
         const [gym] = await db.insert(gyms)
             .values(gymData)
             .returning();
-        
+
         if (!gym) {
             throw new Error("Failed to create gym");
         }
-        
+
         // Update user with gym_id
         await db.update(users)
             .set({ gymId: gym.id })
             .where(eq(users.id, userId));
-        
+
         return gym;
     }
-    
+
     /**
      * Get a gym by user id
-     * Note: This method seems to have a bug in the original - it queries gyms.id = userId
-     * which doesn't make sense. It should probably query by gym_id from users table.
-     * Keeping the original behavior for now to maintain compatibility.
      */
     async getByUserId(userId: number): Promise<Gym | undefined> {
         const gym = await db.query.gyms.findFirst({
-            where: eq(gyms.id, userId),
+            where: eq(gyms.managerId, userId),
         });
         return gym;
     }
-    
+
     /**
      * Get all gyms
      */
     async list(): Promise<Gym[]> {
         return await db.select().from(gyms);
     }
-    
+
     /**
      * Associate a gym to a user
      */
@@ -66,14 +64,14 @@ export class GymsService {
             .set({ gymId })
             .where(eq(users.id, userId))
             .returning();
-        
+
         if (!updatedUser) {
             throw new Error("Failed to associate gym with user");
         }
-        
+
         // Check if user is a higher role (INSTRUCTOR or MANAGER)
         const role = await this.rolesService.getRoleByUserId(userId);
-        if (!this.rolesService.isHigherRole(role)) {
+        if (!this.rolesService.isHigherRole(role ?? "")) {
             // Find gym manager to notify
             const manager = await db.query.users.findFirst({
                 where: and(
@@ -81,7 +79,7 @@ export class GymsService {
                     eq(users.role, "MANAGER")
                 ),
             });
-            
+
             if (manager) {
                 await this.notificationsService.create({
                     title: "Novo aluno associado a academia",

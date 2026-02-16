@@ -1,24 +1,25 @@
 import { BELT_ORDER } from "@/constants/belt";
 import { db } from "@tatame-monorepo/db";
-import { users, graduations } from "@tatame-monorepo/db/schema";
-import { eq, and, or, isNull, isNotNull } from "drizzle-orm";
+import { graduations, users } from "@tatame-monorepo/db/schema";
 import { format } from "date-fns";
+import { and, eq, isNotNull, or } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
 
 type User = typeof users.$inferSelect;
-type NewUser = typeof users.$inferInsert;
 type UserUpdate = Partial<Omit<User, "id">> & { id: number };
 
+/** Service for user CRUD, approval workflow, and user listing by gym. */
 export class UsersService {
     private rolesService: RolesService;
     private notificationsService: NotificationsService;
-    
-    constructor(accessToken: string) {
-        this.rolesService = new RolesService(accessToken);
-        this.notificationsService = new NotificationsService(accessToken);
+
+    constructor() {
+        this.rolesService = new RolesService();
+        this.notificationsService = new NotificationsService();
     }
 
+    /** Creates a new user and auto-approves if role is MANAGER. */
     async create(clerkUserId: string, role: string, email: string, firstName: string, lastName: string, profilePicture: string) {
         const [user] = await db.insert(users).values({
             clerkUserId,
@@ -34,18 +35,21 @@ export class UsersService {
         return user;
     }
 
+    /** Returns the user by id, or undefined if not found. */
     async get(userId: number): Promise<User | undefined> {
         return await db.query.users.findFirst({
             where: eq(users.id, userId),
         });
     }
 
+    /** Returns the user by Clerk user id, or undefined if not found. */
     async getByClerkUserId(clerkUserId: string): Promise<User | undefined> {
         return await db.query.users.findFirst({
             where: eq(users.clerkUserId, clerkUserId),
         });
     }
 
+    /** Lists students for a gym with their graduations, sorted by belt, degree, and name. */
     async listStudentsByGymId(gymId: number) {
         // Fetch users with their graduations
         const studentsWithGraduations = await db
@@ -83,11 +87,12 @@ export class UsersService {
         });
     }
 
+    /** Approves a student and sends a success notification. */
     async approveStudent(userId: number) {
         await db.update(users)
-            .set({ 
-                approvedAt: new Date(), 
-                deniedAt: null 
+            .set({
+                approvedAt: new Date(),
+                deniedAt: null
             })
             .where(eq(users.id, userId));
 
@@ -101,11 +106,12 @@ export class UsersService {
         });
     }
 
+    /** Denies a student and sends a notification. */
     async denyStudent(userId: number) {
         await db.update(users)
-            .set({ 
-                deniedAt: new Date(), 
-                approvedAt: null 
+            .set({
+                deniedAt: new Date(),
+                approvedAt: null
             })
             .where(eq(users.id, userId));
 
@@ -119,12 +125,13 @@ export class UsersService {
         });
     }
 
+    /** Returns true if the user is approved (or has a higher role that doesn't require approval). */
     async getStudentsApprovalStatus(userId: number): Promise<boolean> {
         const role = await this.rolesService.getRoleByUserId(userId);
-        if (this.rolesService.isHigherRole(role)) {
+        if (this.rolesService.isHigherRole(role ?? "")) {
             return true;
         }
-        
+
         const user = await db.query.users.findFirst({
             where: eq(users.id, userId),
             columns: {
@@ -140,6 +147,7 @@ export class UsersService {
         return !!user.approvedAt && !user.deniedAt;
     }
 
+    /** Updates user fields by id. */
     async update(data: UserUpdate): Promise<void> {
         const { id, ...updateData } = data;
         await db.update(users)
@@ -147,12 +155,14 @@ export class UsersService {
             .where(eq(users.id, id));
     }
 
+    /** Soft-deletes a user by setting deletedAt. */
     async delete(userId: string): Promise<void> {
         await db.update(users)
             .set({ deletedAt: new Date() })
             .where(eq(users.id, Number.parseInt(userId)));
     }
 
+    /** Returns users whose birthDay (MM-DD) matches today's date. */
     async getBirthdayUsers(date: string) {
         const formatted = format(new Date(), "MM-dd");
         const birthdayUsers = await db
@@ -165,6 +175,7 @@ export class UsersService {
         });
     }
 
+    /** Lists MANAGER and approved INSTRUCTOR users for the given gym. */
     async listInstructorsByGymId(gymId: number): Promise<User[]> {
         // MANAGER or INSTRUCTOR with approved_at not null
         const instructors = await db

@@ -1,15 +1,12 @@
 import { db } from "@tatame-monorepo/db";
 import { assets } from "@tatame-monorepo/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
+/** Service for class assets (e.g. videos, documents). */
 export class AssetsService {
-    constructor(accessToken: string) {
-        // Access token kept for backward compatibility but not needed for Drizzle
-    }
+    constructor() { }
 
-    /**
-     * Create an asset
-     */
+    /** Creates an asset linked to a class. */
     async create(asset: { class_id?: number | null; title?: string | null; content?: string | null; type?: string | null; valid_until?: string | null }) {
         const [created] = await db
             .insert(assets)
@@ -25,9 +22,7 @@ export class AssetsService {
         return created;
     }
 
-    /**
-     * Delete an asset
-     */
+    /** Deletes an asset by id and returns the deleted row(s). */
     async delete(assetId: number) {
         const deleted = await db
             .delete(assets)
@@ -36,9 +31,7 @@ export class AssetsService {
         return deleted;
     }
 
-    /**
-     * List videos
-     */
+    /** Lists all assets of type "video", newest first. */
     async listVideos() {
         return await db
             .select()

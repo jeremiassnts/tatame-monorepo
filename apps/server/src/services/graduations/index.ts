@@ -6,40 +6,33 @@ type Graduation = typeof graduations.$inferSelect;
 type NewGraduation = typeof graduations.$inferInsert;
 type GraduationUpdate = Partial<Omit<Graduation, "id">> & { id: number };
 
+/** Service for belt/degree graduations per user. */
 export class GraduationsService {
-    constructor(accessToken: string) {
-        // Access token kept for backward compatibility but not needed for Drizzle
-    }
-    
-    /**
-     * Get a graduation by user id
-     */
+    constructor() { }
+
+    /** Returns the graduation for the user, or null if none. */
     async getGraduation(userId: number): Promise<Graduation | null> {
         const graduation = await db.query.graduations.findFirst({
             where: eq(graduations.userId, userId),
         });
-        
+
         return graduation ?? null;
     }
-    
-    /**
-     * Create a graduation
-     */
+
+    /** Creates a new graduation record. */
     async create(graduation: Omit<NewGraduation, "id" | "createdAt">): Promise<Graduation> {
         const [newGraduation] = await db.insert(graduations)
             .values(graduation)
             .returning();
-        
+
         if (!newGraduation) {
             throw new Error("Failed to create graduation");
         }
-        
+
         return newGraduation;
     }
-    
-    /**
-     * Update a graduation
-     */
+
+    /** Updates a graduation by id. */
     async update(graduation: GraduationUpdate): Promise<void> {
         const { id, ...updateData } = graduation;
         await db.update(graduations)

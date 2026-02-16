@@ -63,6 +63,9 @@ importers:
       dotenv:
         specifier: 'catalog:'
         version: 17.2.3
+      drizzle-orm:
+        specifier: ^0.45.1
+        version: 0.45.1(@types/pg@8.16.0)(pg@8.18.0)
       express:
         specifier: ^5.1.0
         version: 5.2.1

@@ -1,12 +1,12 @@
 import { db } from "@tatame-monorepo/db";
 import { versions } from "@tatame-monorepo/db/schema";
-import { isNull, desc } from "drizzle-orm";
+import { desc, isNull } from "drizzle-orm";
 
+/** Service for app version lookup (latest active version). */
 export class VersionsService {
-    constructor(accessToken: string) {
-        // Access token kept for backward compatibility but not needed for Drizzle
-    }
+    constructor() { }
 
+    /** Returns the latest active version (first by id where disabledAt is null). Throws if none found. */
     async get() {
         const version = await db.query.versions.findFirst({
             where: isNull(versions.disabledAt),
