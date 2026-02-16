@@ -10,7 +10,7 @@ export const gyms = pgTable("gyms", {
   name: text("name").notNull(),
   address: text("address").notNull(),
   logo: text("logo"),
-  managerId: integer("managerId").notNull(), // References users.id - circular dependency
+  managerId: integer("managerId"), // Nullable during migration - references users.id (circular dependency)
   since: text("since").notNull(), // Date as text in original
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
