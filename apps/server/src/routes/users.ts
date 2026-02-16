@@ -1,6 +1,9 @@
 import { approveStudentSchema, createUserSchema, denyStudentSchema, updateUserSchema } from "@/schemas/users";
 import { UsersService } from "@/services/users";
 import { Router } from "express";
+import multer from "multer";
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 export const usersRouter: Router = Router();
 
@@ -13,7 +16,7 @@ usersRouter.post("/", async (req, res, next) => {
         }
 
         const validatedBody = createUserSchema.parse(req.body);
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const user = await usersService.create(
             validatedBody.clerkUserId,
             validatedBody.role,
@@ -45,13 +48,49 @@ usersRouter.get("/:userId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const user = await usersService.get(userId);
 
         res.json({
             data: user,
         });
     } catch (error) {
+        next(error);
+    }
+});
+
+// Update profile image (Clerk user id)
+usersRouter.post("/clerk/:clerkUserId/profile-image", upload.single("file"), async (req, res, next) => {
+    try {
+        const accessToken = await req.auth?.getToken();
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const clerkUserId = req.params.clerkUserId as string;
+        if (!clerkUserId) {
+            return res.status(400).json({ error: "Missing user id" });
+        }
+
+        const file = req.file;
+        if (!file) {
+            return res.status(400).json({ error: "Missing file field" });
+        }
+
+        const usersService = new UsersService();
+        const result = await usersService.updateClerkProfileImage(
+            clerkUserId,
+            file.buffer,
+            file.mimetype,
+            file.originalname || "upload",
+        );
+
+        res.json(result);
+    } catch (error) {
+        const err = error as Error & { status?: number; statusCode?: number };
+        if (err?.status === 404 || err?.statusCode === 404 || err?.message?.toLowerCase().includes("not found")) {
+            return res.status(404).json({ error: "User not found" });
+        }
         next(error);
     }
 });
@@ -65,7 +104,7 @@ usersRouter.get("/clerk/:clerkUserId", async (req, res, next) => {
         }
 
         const clerkUserId = req.params.clerkUserId;
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const user = await usersService.getByClerkUserId(clerkUserId);
 
         res.json({
@@ -89,7 +128,7 @@ usersRouter.get("/gym/:gymId/students", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid gymId" });
         }
 
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const students = await usersService.listStudentsByGymId(gymId);
 
         res.json({
@@ -114,7 +153,7 @@ usersRouter.get("/gym/:gymId/instructors", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid gymId" });
         }
 
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const instructors = await usersService.listInstructorsByGymId(gymId);
 
         res.json({
@@ -134,7 +173,7 @@ usersRouter.get("/birthdays/today", async (req, res, next) => {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const users = await usersService.getBirthdayUsers(new Date().toISOString());
 
         res.json({
@@ -155,7 +194,7 @@ usersRouter.post("/approve", async (req, res, next) => {
         }
 
         const validatedBody = approveStudentSchema.parse(req.body);
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         await usersService.approveStudent(validatedBody.userId);
 
         res.json({
@@ -176,7 +215,7 @@ usersRouter.post("/deny", async (req, res, next) => {
         }
 
         const validatedBody = denyStudentSchema.parse(req.body);
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         await usersService.denyStudent(validatedBody.userId);
 
         res.json({
@@ -201,7 +240,7 @@ usersRouter.get("/:userId/approval-status", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         const isApproved = await usersService.getStudentsApprovalStatus(userId);
 
         res.json({
@@ -226,7 +265,7 @@ usersRouter.put("/:userId", async (req, res, next) => {
         }
 
         const validatedBody = updateUserSchema.parse({ ...req.body, id: userId });
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         await usersService.update(validatedBody);
 
         res.json({
@@ -247,7 +286,7 @@ usersRouter.delete("/:userId", async (req, res, next) => {
         }
 
         const userId = req.params.userId;
-        const usersService = new UsersService(accessToken);
+        const usersService = new UsersService();
         await usersService.delete(userId);
 
         res.json({

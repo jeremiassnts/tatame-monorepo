@@ -13,7 +13,7 @@ checkinsRouter.post("/", async (req, res, next) => {
         }
 
         const validatedBody = createCheckinSchema.parse(req.body);
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         await checkinsService.create({
             userId: validatedBody.userId,
             classId: validatedBody.classId,
@@ -42,7 +42,7 @@ checkinsRouter.delete("/:checkinId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid checkinId" });
         }
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         await checkinsService.delete(checkinId);
 
         res.json({
@@ -67,7 +67,7 @@ checkinsRouter.get("/user/:userId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         const checkins = await checkinsService.listByUserId(userId);
 
         res.json({
@@ -91,7 +91,7 @@ checkinsRouter.get("/user/:userId/last", async (req, res, next) => {
             userId: req.params.userId,
         });
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         const checkins = await checkinsService.listLastCheckinsByUserId(validatedParams.userId);
 
         res.json({
@@ -115,7 +115,7 @@ checkinsRouter.get("/user/:userId/last-month", async (req, res, next) => {
             userId: req.params.userId,
         });
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         const checkins = await checkinsService.listLastMonthCheckinsByUserId(validatedParams.userId);
 
         res.json({
@@ -139,7 +139,7 @@ checkinsRouter.get("/class/:classId", async (req, res, next) => {
             classId: req.params.classId,
         });
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         const checkins = await checkinsService.listByClassId(validatedParams.classId);
 
         res.json({
@@ -164,7 +164,7 @@ checkinsRouter.get("/class/:classId/user/:userId", async (req, res, next) => {
             userId: req.params.userId,
         });
 
-        const checkinsService = new CheckinsService(accessToken);
+        const checkinsService = new CheckinsService();
         const checkins = await checkinsService.listByClassIdAndUserId(
             validatedParams.classId,
             validatedParams.userId,

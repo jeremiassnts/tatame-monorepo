@@ -19,7 +19,7 @@ gymsRouter.post("/", async (req, res, next) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const gymsService = new GymsService(accessToken);
+        const gymsService = new GymsService();
         const gym = await gymsService.create({
             name: validatedBody.name,
             address: validatedBody.address ?? "",
@@ -45,7 +45,7 @@ gymsRouter.get("/", async (req, res, next) => {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const gymsService = new GymsService(accessToken);
+        const gymsService = new GymsService();
         const gyms = await gymsService.list();
 
         res.json({
@@ -70,7 +70,7 @@ gymsRouter.get("/user/:userId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const gymsService = new GymsService(accessToken);
+        const gymsService = new GymsService();
         const gym = await gymsService.getByUserId(userId);
 
         res.json({
@@ -90,7 +90,7 @@ gymsRouter.post("/associate", async (req, res, next) => {
         }
 
         const validatedBody = associateGymSchema.parse(req.body);
-        const gymsService = new GymsService(accessToken);
+        const gymsService = new GymsService();
         await gymsService.associate(validatedBody.gymId, validatedBody.userId);
 
         res.json({

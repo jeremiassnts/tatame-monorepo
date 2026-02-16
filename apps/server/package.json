@@ -11,6 +11,7 @@
     "migrate:clerk": "tsx scripts/migrate-clerk-users.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.358.0",
     "@clerk/express": "^1.4.5",
     "@tatame-monorepo/db": "workspace:*",
     "@tatame-monorepo/env": "workspace:*",
@@ -19,6 +20,7 @@
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",
     "express": "^5.1.0",
+    "multer": "^2.0.2",
     "resend": "^6.9.1",
     "stripe": "^17.6.0",
     "zod": "catalog:"
@@ -27,6 +29,7 @@
     "@tatame-monorepo/config": "workspace:*",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.13.14",
     "tsdown": "^0.16.5",
     "tsx": "^4.19.2",

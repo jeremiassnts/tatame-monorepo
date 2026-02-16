@@ -1,10 +1,19 @@
 import { BELT_ORDER } from "@/constants/belt";
+import { createClerkClient } from "@clerk/express";
 import { db } from "@tatame-monorepo/db";
 import { graduations, users } from "@tatame-monorepo/db/schema";
+import { env } from "@tatame-monorepo/env/server";
 import { format } from "date-fns";
 import { and, eq, isNotNull, or } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
+
+export interface MinimalProfileResponse {
+    id: string;
+    email: string | null;
+    name: string | null;
+    image_url: string;
+}
 
 type User = typeof users.$inferSelect;
 type UserUpdate = Partial<Omit<User, "id">> & { id: number };
@@ -195,5 +204,48 @@ export class UsersService {
             );
 
         return instructors;
+    }
+
+    /** Updates a Clerk user's profile image and returns a minimal payload. */
+    async updateClerkProfileImage(
+        clerkUserId: string,
+        fileBuffer: Buffer,
+        mimetype: string,
+        filename: string,
+    ): Promise<MinimalProfileResponse> {
+        const clerk = createClerkClient({
+            secretKey: env.CLERK_SECRET_KEY,
+            publishableKey: env.CLERK_PUBLISHABLE_KEY,
+        });
+
+        const file = new File([fileBuffer], filename, { type: mimetype || "application/octet-stream" });
+        const user = await clerk.users.updateUserProfileImage(clerkUserId, { file });
+
+        const u = user as unknown as Record<string, unknown>;
+        return {
+            id: user.id,
+            email: getPrimaryEmailFromClerk(u),
+            name: getNameFromClerk(u),
+            image_url: user.imageUrl ?? "",
+        };
+    }
+}
+
+function getNameFromClerk(user: Record<string, unknown>): string | null {
+    if (user?.full_name) return String(user.full_name);
+    const first = (user?.first_name as string) ?? "";
+    const last = (user?.last_name as string) ?? "";
+    const combined = `${first} ${last}`.trim();
+    return combined.length ? combined : null;
+}
+
+function getPrimaryEmailFromClerk(user: Record<string, unknown>): string | null {
+    try {
+        const primaryId = user?.primary_email_address_id as string | undefined;
+        const emailAddrs = (user?.email_addresses as { id: string; email_address?: string }[] | undefined) ?? [];
+        const emailObj = emailAddrs.find((e) => e.id === primaryId);
+        return emailObj?.email_address ?? null;
+    } catch {
+        return null;
     }
 }

@@ -17,7 +17,7 @@ graduationsRouter.get("/user/:userId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const graduationsService = new GraduationsService(accessToken);
+        const graduationsService = new GraduationsService();
         const graduation = await graduationsService.getGraduation(userId);
 
         res.json({
@@ -37,7 +37,7 @@ graduationsRouter.post("/", async (req, res, next) => {
         }
 
         const validatedBody = createGraduationSchema.parse(req.body);
-        const graduationsService = new GraduationsService(accessToken);
+        const graduationsService = new GraduationsService();
         const graduation = await graduationsService.create({
             userId: validatedBody.userId,
             belt: validatedBody.belt,
@@ -68,7 +68,7 @@ graduationsRouter.put("/:graduationId", async (req, res, next) => {
         }
 
         const validatedBody = updateGraduationSchema.parse({ ...req.body, id: graduationId });
-        const graduationsService = new GraduationsService(accessToken);
+        const graduationsService = new GraduationsService();
         await graduationsService.update(validatedBody);
 
         res.json({

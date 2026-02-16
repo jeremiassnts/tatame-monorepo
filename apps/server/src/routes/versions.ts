@@ -11,7 +11,7 @@ versionsRouter.get("/", async (req, res, next) => {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const versionsService = new VersionsService(accessToken);
+        const versionsService = new VersionsService();
         const version = await versionsService.get();
 
         res.json({

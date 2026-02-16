@@ -13,7 +13,7 @@ notificationsRouter.post("/", async (req, res, next) => {
         }
 
         const validatedBody = createNotificationSchema.parse(req.body);
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         const notification = await notificationsService.create({
             title: validatedBody.title,
             content: validatedBody.content,
@@ -46,7 +46,7 @@ notificationsRouter.get("/user/:userId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         const notifications = await notificationsService.listByUserId(userId);
 
         res.json({
@@ -71,7 +71,7 @@ notificationsRouter.get("/user/:userId/unread", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid userId" });
         }
 
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         const notifications = await notificationsService.listUnreadByUserId(userId);
 
         res.json({
@@ -97,7 +97,7 @@ notificationsRouter.put("/:notificationId", async (req, res, next) => {
         }
 
         const validatedBody = updateNotificationSchema.parse({ ...req.body, id: notificationId });
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         await notificationsService.update(validatedBody);
 
         res.json({
@@ -122,7 +122,7 @@ notificationsRouter.post("/:notificationId/resend", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid notificationId" });
         }
 
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         await notificationsService.resend(notificationId);
 
         res.json({
@@ -147,12 +147,12 @@ notificationsRouter.post("/:notificationId/view", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid notificationId" });
         }
 
-        const validatedBody = viewNotificationSchema.parse({ 
+        const validatedBody = viewNotificationSchema.parse({
             id: notificationId,
             userId: req.body.userId,
         });
 
-        const notificationsService = new NotificationsService(accessToken);
+        const notificationsService = new NotificationsService();
         await notificationsService.view(validatedBody.id, validatedBody.userId);
 
         res.json({

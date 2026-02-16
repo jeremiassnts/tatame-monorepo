@@ -17,7 +17,7 @@ classRouter.get("/next/:gymId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid gymId" });
         }
 
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         const nextClass = await classService.nextClass(gymId);
 
         res.json({
@@ -37,7 +37,7 @@ classRouter.post("/", async (req, res, next) => {
         }
 
         const validatedBody = createClassSchema.parse(req.body);
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         const classData = await classService.create(validatedBody);
 
         res.status(201).json({
@@ -62,7 +62,7 @@ classRouter.get("/gym/:gymId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid gymId" });
         }
 
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         const classes = await classService.list(gymId);
 
         res.json({
@@ -87,7 +87,7 @@ classRouter.get("/:classId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid classId" });
         }
 
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         const classData = await classService.get(classId);
 
         res.json({
@@ -112,7 +112,7 @@ classRouter.put("/:classId", async (req, res, next) => {
         }
 
         const validatedBody = updateClassSchema.parse({ ...req.body, id: classId });
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         await classService.edit(validatedBody);
 
         res.json({
@@ -137,7 +137,7 @@ classRouter.delete("/:classId", async (req, res, next) => {
             return res.status(400).json({ error: "Invalid classId" });
         }
 
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         await classService.delete(classId);
 
         res.json({
@@ -158,7 +158,7 @@ classRouter.get("/check-in/available", async (req, res, next) => {
         }
 
         const validatedQuery = getToCheckInSchema.parse(req.query);
-        const classService = new ClassService(accessToken);
+        const classService = new ClassService();
         const classData = await classService.getToCheckIn(
             validatedQuery.gymId,
             validatedQuery.time,
