@@ -1,13 +1,17 @@
 /**
- * Phase 3 Migration Script
- * Migrates user-related tables: users, graduations
- * 
+ * Phase 3 Data Migration Script
+ * Copies users, graduations from Supabase → Postgres
+ *
+ * NOTE: This is the DATA migration step. Structure migration (schemas, services)
+ * is complete without running this. Run this only when Postgres is running
+ * and you are ready to copy data.
+ *
  * CRITICAL: This is the highest risk migration phase
  * - Users table has 20+ columns
  * - Required by almost all other tables
  * - Clerk integration must remain intact
- * 
- * Run with: pnpm tsx scripts/migrate-phase-3.ts
+ *
+ * Run with: pnpm migrate:phase-3
  */
 
 import { db } from "../src/index.js";

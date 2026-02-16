@@ -1,8 +1,11 @@
 /**
- * Phase 1 Migration Script
- * Migrates infrastructure tables: roles, versions, app_stores
- * 
- * Run with: pnpm tsx scripts/migrate-phase-1.ts
+ * Phase 1 Data Migration Script
+ * Copies roles, versions, app_stores from Supabase → Postgres
+ *
+ * NOTE: This is the DATA migration step. Structure migration (schemas, services)
+ * is complete without running this. Run only when Postgres is running.
+ *
+ * Run with: pnpm migrate:phase-1
  */
 
 import { db } from "../src/index.js";

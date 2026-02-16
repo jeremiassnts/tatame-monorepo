@@ -7,6 +7,19 @@
 
 ---
 
+## ⚠️ Structure vs. Data Migration
+
+**Each phase has two distinct steps:**
+
+| Step | What | When to do it |
+|------|------|---------------|
+| **1. Structure migration** | Schema definitions, service code updates, migration scripts | Do this first. Commit and deploy. No database needed. |
+| **2. Data migration** | Run `pnpm migrate:phase-X` to copy data from Supabase → Postgres | Do later, when Postgres is running and you're ready to switch. |
+
+**You do NOT need to run data migration scripts to complete a phase.** Structure migration (schema + services + scripts) is sufficient. Run the data migration only when you want to actually copy data and cut over to Postgres.
+
+---
+
 ## 📚 Documentation Index
 
 This directory contains the complete migration plan from Supabase to PostgreSQL with Drizzle ORM.
@@ -257,16 +270,16 @@ Each phase includes:
 
 ## ✅ Success Criteria
 
-### Per-Phase Success
+### Per-Phase Success (Structure Migration)
 
-A phase is complete when:
-- ✅ All schemas defined and migrated
-- ✅ Data validated (row counts, relationships)
-- ✅ Services updated and tested
+A phase structure is complete when:
+- ✅ All schemas defined
+- ✅ Services updated to use Drizzle
+- ✅ Migration scripts created
 - ✅ Integration tests pass
-- ✅ Performance acceptable
-- ✅ Rollback tested
 - ✅ Documentation updated
+
+*Data migration (running scripts, validating row counts) is a separate step, done when ready to cut over.*
 
 ### Migration Complete
 
@@ -417,6 +430,12 @@ pnpm db:studio
 
 # Stop database
 pnpm db:stop
+
+# Data migration (copy Supabase → Postgres) – run only when ready
+pnpm migrate:phase-1  # roles, versions, app_stores
+pnpm migrate:phase-2  # gyms
+pnpm migrate:phase-3  # users, graduations
+pnpm migrate:phase-4  # class, checkins, assets
 ```
 
 ### External Resources

@@ -72,9 +72,9 @@
 
 ### Pending ⏳
 
-#### Data Migration
-- ⏳ Apply schema with `pnpm db:push`
-- ⏳ Run migration script: `pnpm migrate:phase-3`
+#### Data Migration (optional – run when ready to copy data to Postgres)
+- ⏳ Apply schema with `pnpm db:push` (when Postgres is running)
+- ⏳ Run data migration script: `pnpm migrate:phase-3` (optional, separate step)
 - ⏳ Verify users data in Drizzle Studio
 - ⏳ Verify graduations data
 - ⏳ Verify gym managers updated correctly

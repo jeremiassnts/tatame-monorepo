@@ -1,8 +1,11 @@
 /**
- * Phase 2 Migration Script
- * Migrates core domain table: gyms
- * 
- * Run with: pnpm tsx scripts/migrate-phase-2.ts
+ * Phase 2 Data Migration Script
+ * Copies gyms from Supabase → Postgres
+ *
+ * NOTE: This is the DATA migration step. Structure migration (schemas, services)
+ * is complete without running this. Run only when Postgres is running.
+ *
+ * Run with: pnpm migrate:phase-2
  */
 
 import { db } from "../src/index.js";

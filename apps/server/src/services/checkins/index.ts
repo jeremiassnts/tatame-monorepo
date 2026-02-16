@@ -1,134 +1,166 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { subDays } from "date-fns";
-import { SupabaseService } from "../supabase";
-import type { Database } from "../supabase/types";
+import { db } from "@tatame-monorepo/db";
+import { checkins, users, classTable } from "@tatame-monorepo/db/schema";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
 
 export class CheckinsService {
-    private supabase: SupabaseClient;
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
+        // Access token kept for backward compatibility but not needed for Drizzle
     }
+
     /**
      * Create a checkin
      */
-    async create(checkin: Database["public"]["Tables"]["checkins"]["Insert"]) {
-        //verify if the user has already checked in for this class
-        const { data: checkinData } = await this.supabase
-            .from("checkins")
-            .select("*")
-            .eq("classId", checkin.classId)
-            .eq("userId", checkin.userId);
-        if (checkinData && checkinData.length > 0) {
+    async create(checkin: { classId: number | null; userId: number | null; date?: string | null }) {
+        if (!checkin.classId || !checkin.userId) return;
+
+        const existing = await db
+            .select()
+            .from(checkins)
+            .where(
+                and(
+                    eq(checkins.classId, checkin.classId),
+                    eq(checkins.userId, checkin.userId),
+                ),
+            );
+
+        if (existing.length > 0) {
             return;
         }
-        const { error } = await this.supabase.from("checkins").insert(checkin);
-        if (error) {
-            throw error;
-        }
+
+        await db.insert(checkins).values({
+            classId: checkin.classId,
+            userId: checkin.userId,
+            date: checkin.date ?? new Date().toISOString(),
+        });
     }
+
     /**
      * Delete a checkin
      */
     async delete(checkinId: number) {
-        const { data, error } = await this.supabase.from("checkins").delete().eq("id", checkinId);
-        if (error) {
-            throw error;
-        }
-        return data;
+        const deleted = await db
+            .delete(checkins)
+            .where(eq(checkins.id, checkinId))
+            .returning();
+        return deleted;
     }
+
     /**
-     * List checkins by user id
+     * List checkins by user id (for today)
      */
     async listByUserId(userId: number) {
-        const { data, error } = await this.supabase.from("checkins")
-            .select("*")
-            .eq("usersId", userId)
-            .eq("date", new Date().toISOString());
-
-        if (error) {
-            throw error;
-        }
-        return data;
+        const today = new Date().toISOString().split("T")[0];
+        return await db
+            .select()
+            .from(checkins)
+            .where(
+                and(
+                    eq(checkins.userId, userId),
+                    eq(checkins.date, today),
+                ),
+            );
     }
+
     /**
-     * List checkins by class id
+     * List checkins by class id and user id (for today)
      */
     async listByClassIdAndUserId(classId: number, userId: number) {
-        const { data, error } = await this.supabase
-            .from("checkins")
-            .select("*")
-            .eq("userId", userId)
-            .eq("date", new Date().toISOString())
-            .eq("classId", classId);
-
-        if (error) {
-            throw error;
-        }
-
-        return data;
+        const today = new Date().toISOString().split("T")[0];
+        return await db
+            .select()
+            .from(checkins)
+            .where(
+                and(
+                    eq(checkins.userId, userId),
+                    eq(checkins.date, today),
+                    eq(checkins.classId, classId),
+                ),
+            );
     }
-    /*
-        * List last checkins
-    */
-    async listLastCheckinsByUserId(userId: number) {
-        const { data, error } = await this.supabase
-            .from("checkins")
-            .select("*")
-            .eq("userId", userId)
-            .gte("date", subDays(new Date(), 15).toISOString())
-            .lte("date", new Date().toISOString());
 
-        if (error) {
-            console.error(error);
-            throw error;
-        }
-
-        return data;
-    }
     /**
-     * List checkins by class id
+     * List last checkins by user id (last 15 days)
+     */
+    async listLastCheckinsByUserId(userId: number) {
+        const fromDate = subDays(new Date(), 15).toISOString().split("T")[0];
+        const toDate = new Date().toISOString().split("T")[0];
+
+        return await db
+            .select()
+            .from(checkins)
+            .where(
+                and(
+                    eq(checkins.userId, userId),
+                    gte(checkins.date, fromDate),
+                    lte(checkins.date, toDate),
+                ),
+            );
+    }
+
+    /**
+     * List checkins by class id (for today, with user details)
      */
     async listByClassId(classId: number) {
-        const { data, error } = await this.supabase
-            .from("checkins")
-            .select("*, users(first_name, last_name, profile_picture)")
-            .eq("classId", classId)
-            .eq("date", new Date().toISOString());
-        if (error) {
-            throw error;
-        }
+        const today = new Date().toISOString().split("T")[0];
 
-        return data.map((checkin) => {
-            return {
-                ...checkin,
-                name: (
-                    (checkin.users?.first_name ?? "") +
-                    " " +
-                    (checkin.users?.last_name ?? "")
-                ).trim(),
-                imageUrl: checkin.users?.profile_picture ?? "",
-            };
-        });
+        const data = await db
+            .select({
+                checkin: checkins,
+                firstName: users.firstName,
+                lastName: users.lastName,
+                profilePicture: users.profilePicture,
+            })
+            .from(checkins)
+            .leftJoin(users, eq(checkins.userId, users.id))
+            .where(
+                and(
+                    eq(checkins.classId, classId),
+                    eq(checkins.date, today),
+                ),
+            );
+
+        return data.map((row) => ({
+            ...row.checkin,
+            name: `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim(),
+            imageUrl: row.profilePicture ?? "",
+        }));
     }
+
     /**
      * List last month checkins by user id
      */
     async listLastMonthCheckinsByUserId(userId: number) {
-        const { data, error } = await this.supabase
-            .from("checkins")
-            .select(
-                "*, class!inner(id, start, end, day)",
+        const fromDate = subDays(new Date(), 30).toISOString().split("T")[0];
+        const toDate = new Date().toISOString().split("T")[0];
+
+        const data = await db
+            .select({
+                checkin: checkins,
+                classId: classTable.id,
+                classStart: classTable.start,
+                classEnd: classTable.end,
+                classDay: classTable.day,
+            })
+            .from(checkins)
+            .innerJoin(classTable, eq(checkins.classId, classTable.id))
+            .where(
+                and(
+                    eq(checkins.userId, userId),
+                    gte(checkins.date, fromDate),
+                    lte(checkins.date, toDate),
+                ),
             )
-            .eq("userId", userId)
-            .gte("date", subDays(new Date(), 30).toISOString())
-            .lte("date", new Date().toISOString())
-            .order("date", { ascending: false });
+            .orderBy(desc(checkins.date));
 
-        if (error) {
-            console.error(error);
-            throw error;
-        }
-
-        return data
+        return data.map((row) => ({
+            ...row.checkin,
+            class: {
+                id: row.classId,
+                start: row.classStart,
+                end: row.classEnd,
+                day: row.classDay,
+            },
+        }));
     }
 }

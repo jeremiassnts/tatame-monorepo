@@ -105,6 +105,15 @@ Phase 0: Foundation Setup (1-2 days)
 4. **Feature Flags**: Use environment variables to control which database is active during testing
 5. **Manual Data Migration**: Export from Supabase, import to Postgres with validation
 
+### Structure vs. Data Migration
+
+| Type | What it includes | When |
+|------|------------------|------|
+| **Structure migration** | Drizzle schemas, service code (Drizzle), migration scripts (`migrate-phase-X.ts`) | Done per phase. Commit without running data scripts. |
+| **Data migration** | Running `pnpm migrate:phase-X` to copy Supabase data into Postgres | Separate step. Only when Postgres is running and cutover is planned. |
+
+**Phase completion = structure migration.** You do not need to run the data migration scripts to complete a phase.
+
 ---
 
 ## 4. Phase Breakdown
