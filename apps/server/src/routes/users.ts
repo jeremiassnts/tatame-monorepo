@@ -266,7 +266,16 @@ usersRouter.put("/:userId", async (req, res, next) => {
 
         const validatedBody = updateUserSchema.parse({ ...req.body, id: userId });
         const usersService = new UsersService();
-        await usersService.update(validatedBody);
+        const updateData: Record<string, unknown> = { id: validatedBody.id };
+        if (validatedBody.first_name !== undefined) updateData.firstName = validatedBody.first_name;
+        if (validatedBody.last_name !== undefined) updateData.lastName = validatedBody.last_name;
+        if (validatedBody.email !== undefined) updateData.email = validatedBody.email;
+        if (validatedBody.phone !== undefined) updateData.phone = validatedBody.phone;
+        if (validatedBody.birth_day !== undefined) updateData.birthDay = validatedBody.birth_day;
+        if (validatedBody.profile_picture !== undefined) updateData.profilePicture = validatedBody.profile_picture;
+        if (validatedBody.gym_id !== undefined) updateData.gymId = validatedBody.gym_id;
+        if (validatedBody.role !== undefined) updateData.role = validatedBody.role;
+        await usersService.update(updateData as { id: number } & Record<string, unknown>);
 
         res.json({
             success: true,

@@ -180,6 +180,30 @@ curl -X GET "http://localhost:3000/stripe/products" \
 stripe trigger customer.created
 ```
 
+### Unit Tests
+
+```bash
+pnpm test
+```
+
+### E2E Tests
+
+E2E tests use a real PostgreSQL database with shared test DB + cleanup between tests. Auth bypass via `X-Test-User-Id` header (no real Clerk tokens).
+
+**Prerequisites:**
+- PostgreSQL running (e.g. `cd packages/db && docker compose up -d`)
+- Test database `tatame_test` exists (create via `psql` or `docker exec` if needed)
+
+```bash
+# Create test DB (if using docker-compose Postgres)
+docker exec tatame-monorepo-postgres psql -U postgres -d tatame-monorepo -c "CREATE DATABASE tatame_test"
+
+# Run E2E tests
+pnpm test:e2e
+```
+
+Optional: set `TEST_DATABASE_URL` in `.env` (default: `postgresql://postgres:password@localhost:5432/tatame_test`).
+
 ### Type Checking
 
 ```bash
@@ -199,6 +223,7 @@ pnpm check-types
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_ANON_KEY` | Yes | Supabase service role key |
 | `DATABASE_URL` | No | PostgreSQL connection (optional for Supabase-only mode) |
+| `TEST_DATABASE_URL` | No | PostgreSQL for E2E tests (default: `.../tatame_test`) |
 
 ## Documentation
 

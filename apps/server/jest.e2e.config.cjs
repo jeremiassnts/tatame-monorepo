@@ -3,13 +3,10 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   roots: ["<rootDir>/src"],
-  testMatch: ["**/__tests__/**/*.test.ts"],
-  testPathIgnorePatterns: ["/__tests__/e2e/"],
+  testMatch: ["**/__tests__/e2e/**/*.test.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts"],
-  coverageDirectory: "coverage",
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
@@ -19,4 +16,8 @@ module.exports = {
       },
     ],
   },
+  setupFiles: ["<rootDir>/src/__tests__/e2e/setup.ts"],
+  testTimeout: 15000,
+  forceExit: true,
+  maxWorkers: 1,
 };

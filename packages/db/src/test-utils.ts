@@ -1,22 +1,27 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { Pool } from "pg";
+import path from "path";
 import * as schema from "./schema";
+
+// Resolve migrations path (CJS/Jest compatible; no import.meta)
+const cwd = process.cwd();
+const migrationsFolder = cwd.endsWith("server")
+  ? path.resolve(cwd, "..", "..", "packages", "db", "src", "migrations")
+  : path.resolve(cwd, "packages", "db", "src", "migrations");
 
 let testPool: Pool | null = null;
 let testDb: ReturnType<typeof drizzle> | null = null;
 
 export async function setupTestDatabase() {
-  // Use separate test database
-  testPool = new Pool({
-    connectionString: process.env.TEST_DATABASE_URL || 
-      "postgresql://postgres:postgres@localhost:5432/tatame_test",
-  });
-  
+  const connectionString =
+    process.env.TEST_DATABASE_URL ||
+    "postgresql://postgres:password@localhost:5432/tatame_test";
+
+  testPool = new Pool({ connectionString });
   testDb = drizzle(testPool, { schema });
-  
-  // Run migrations
-  await migrate(testDb, { migrationsFolder: "./src/migrations" });
+
+  await migrate(testDb, { migrationsFolder });
   
   return testDb;
 }

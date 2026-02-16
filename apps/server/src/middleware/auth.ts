@@ -1,4 +1,5 @@
 import { clerkMiddleware, getAuth } from "@clerk/express";
+import type { SessionAuthObject } from "@clerk/express";
 import { env } from "@tatame-monorepo/env/server";
 import type { RequestHandler } from "express";
 
@@ -12,13 +13,31 @@ export const authMiddleware: RequestHandler = clerkMiddleware({
 });
 
 /**
- * Middleware to protect routes by requiring authentication
- * Returns 401 for unauthenticated requests (suitable for APIs)
+ * Test auth bypass: when NODE_ENV=test and X-Test-User-Id header is present,
+ * treats the request as authenticated with that userId. Used for E2E testing
+ * without real Clerk tokens.
  */
+const TEST_USER_ID_HEADER = "X-Test-User-Id";
+
 export const requireAuth: RequestHandler = (req, res, next) => {
   if (req.path.startsWith("/webhooks")) {
     return next();
   }
+
+  // E2E test bypass: use header as authenticated user when in test env
+  if (process.env.NODE_ENV === "test") {
+    const testUserId = req.get(TEST_USER_ID_HEADER);
+    if (testUserId) {
+      req.auth = {
+        userId: testUserId,
+        sessionId: "test-session",
+        getToken: async () => "test-token",
+        sessionClaims: {},
+      } as SessionAuthObject;
+      return next();
+    }
+  }
+
   const auth = getAuth(req);
 
   if (!auth?.userId) {
