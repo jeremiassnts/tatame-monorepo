@@ -1,7 +1,7 @@
 # Postgres Migration - Current Status
 
 **Last Updated:** 2026-02-15  
-**Current Phase:** Phase 3 (User-Related Tables) - CODE COMPLETE
+**Current Phase:** Phase 5 (Notifications) - CODE COMPLETE
 
 ---
 
@@ -12,10 +12,10 @@
 ✅ Phase 1: Infrastructure Tables (COMPLETE - 2026-02-14)
 ✅ Phase 2: Core Domain Tables (COMPLETE - 2026-02-15)
 ✅ Phase 3: User-Related Tables (CODE COMPLETE - 2026-02-15)
-   ⏳ Data Migration Pending (awaiting execution)
-   ├─► Phase 4: Class & Activity Tables (NEXT)
-   ├─► Phase 5: Notifications Table
-   └─► Phase 6: Cutover & Cleanup
+✅ Phase 4: Class & Activity Tables (CODE COMPLETE)
+✅ Phase 5: Notifications Table (CODE COMPLETE - 2026-02-15)
+   ├─► Phase 6: Cutover & Cleanup (NEXT)
+   └─► Data migration scripts: run when Postgres is ready
 ```
 
 ---
@@ -146,8 +146,8 @@ pnpm db:studio         # Verify data
 - ✅ Infrastructure tables complete (Phase 1)
 - ✅ Core domain table complete (Phase 2)
 - ✅ User data and auth complete (Phase 3) ⭐
-- ⏳ Activity tables pending (Phase 4)
-- ⏳ Notifications pending (Phase 5)
+- ✅ Activity tables complete (Phase 4)
+- ✅ Notifications migrated to Drizzle (Phase 5)
 - ⏳ Final cutover pending (Phase 6)
 
 ---

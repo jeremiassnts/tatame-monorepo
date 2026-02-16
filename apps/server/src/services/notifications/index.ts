@@ -1,148 +1,183 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { db } from "@tatame-monorepo/db";
+import { notifications, users } from "@tatame-monorepo/db/schema";
+import { eq, inArray, or, sql, desc } from "drizzle-orm";
 import { RolesService } from "../roles";
-import { SupabaseService } from "../supabase";
-import type { Database } from "../supabase/types";
 import { UsersService } from "../users";
 import type { SendNotificationProps } from "./types";
 
+/** Insert shape from API (snake_case) */
+export type NotificationInsert = {
+    title?: string | null;
+    content?: string | null;
+    recipients?: string[] | null;
+    channel?: string | null;
+    sent_by?: number | null;
+    status?: string | null;
+    viewed_by?: string[] | null;
+};
+
+/** Update shape from API */
+export type NotificationUpdate = {
+    id: number;
+    title?: string | null;
+    content?: string | null;
+    status?: string | null;
+    viewed_by?: string[] | null;
+};
+
 export class NotificationsService {
-    private supabase: SupabaseClient;
     private rolesService: RolesService;
     private usersService: UsersService;
+
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
         this.rolesService = new RolesService(accessToken);
         this.usersService = new UsersService(accessToken);
     }
 
-    async create(notification: Database["public"]["Tables"]["notifications"]["Insert"]) {
-        const { data, error } = await this.supabase.from("notifications").insert(notification)
-            .select()
+    async create(notification: NotificationInsert) {
+        const [row] = await db
+            .insert(notifications)
+            .values({
+                title: notification.title ?? null,
+                content: notification.content ?? null,
+                recipients: notification.recipients ?? [],
+                channel: notification.channel ?? "push",
+                sentBy: notification.sent_by ?? null,
+                status: notification.status ?? "pending",
+                viewedBy: notification.viewed_by ?? [],
+            })
+            .returning();
 
-        if (error) {
-            throw error;
-        }
+        if (!row) throw new Error("Failed to create notification");
+
         try {
             await this.sendNotification({
-                id: data[0].id,
+                id: row.id,
                 channel: "push",
-                title: data[0].title ?? "",
-                content: data[0].content ?? "",
-                recipients: data[0].recipients ?? [],
-            })
-            await this.supabase.from("notifications").update({
-                id: data[0].id,
-                status: "sent",
-                sent_at: new Date().toISOString(),
-            }).eq("id", data[0].id)
+                title: row.title ?? "",
+                content: row.content ?? "",
+                recipients: row.recipients ?? [],
+            });
+            await db
+                .update(notifications)
+                .set({ status: "sent", sentAt: new Date() })
+                .where(eq(notifications.id, row.id));
         } catch (error) {
-            this.supabase.from("notifications").update({
-                id: data[0].id,
-                status: "failed",
-            }).eq("id", data[0].id)
+            await db
+                .update(notifications)
+                .set({ status: "failed" })
+                .where(eq(notifications.id, row.id));
         }
-        return data[0];
+        return row;
     }
 
     async listByUserId(userId: number) {
-        const { data, error } = await this.supabase
-            .from("notifications")
-            .select("*, users(first_name, last_name, profile_picture)")
-            .or(
-                `recipients.cs.{${userId.toString()}},sent_by.eq.${userId.toString()}`,
+        const userIdStr = userId.toString();
+        const rows = await db
+            .select({
+                notification: notifications,
+                senderFirstName: users.firstName,
+                senderLastName: users.lastName,
+                senderProfilePicture: users.profilePicture,
+            })
+            .from(notifications)
+            .leftJoin(users, eq(notifications.sentBy, users.id))
+            .where(
+                or(
+                    eq(notifications.sentBy, userId),
+                    sql`array_position(COALESCE(${notifications.recipients}, ARRAY[]::text[]), ${userIdStr}) IS NOT NULL`,
+                ),
             )
-            .order("created_at", { ascending: false });
-        if (error) {
-            throw error;
-        } else if (!data) {
-            return [];
-        }
+            .orderBy(desc(notifications.createdAt));
 
-        return data.map((notification) => {
-            const sent_by_name = (
-                (notification.users?.first_name ?? "") +
-                " " +
-                (notification.users?.last_name ?? "")
-            ).trim();
+        return rows.map((row) => {
+            const n = row.notification;
+            const sentByName = [row.senderFirstName ?? "", row.senderLastName ?? ""].join(" ").trim();
             return {
-                ...notification,
-                sent_by_name: sent_by_name,
-                sent_by_image_url: notification.users?.profile_picture ?? "",
-            }
+                ...n,
+                sent_by_name: sentByName,
+                sent_by_image_url: row.senderProfilePicture ?? "",
+            };
         });
     }
 
     async listUnreadByUserId(userId: number) {
         const currentUser = await this.usersService.get(userId);
-        if (!this.rolesService.isHigherRole(currentUser.role) && !currentUser?.approved_at) {
+        if (!currentUser || (!this.rolesService.isHigherRole(currentUser.role ?? "") && !currentUser.approvedAt)) {
             return [];
         }
 
-        const { data } = await this.supabase
-            .from("notifications")
-            .select("*")
-            .contains("recipients", [userId])
-            .or(`sent_by.neq.${userId},sent_by.is.null`)
-            .order("created_at", { ascending: false });
-        const filteredData = data?.filter((e) => !e.viewed_by?.includes(userId));
-        return filteredData;
+        const userIdStr = userId.toString();
+        const rows = await db
+            .select()
+            .from(notifications)
+            .where(
+                sql`array_position(COALESCE(${notifications.recipients}, ARRAY[]::text[]), ${userIdStr}) IS NOT NULL`,
+            )
+            .orderBy(desc(notifications.createdAt));
+
+        return rows.filter((n) => {
+            const viewedBy = n.viewedBy ?? [];
+            const isSender = n.sentBy === userId;
+            if (isSender) return false;
+            return !viewedBy.includes(userIdStr);
+        });
     }
 
-    async update(notification: Database["public"]["Tables"]["notifications"]["Update"]) {
-        const { data, error } = await this.supabase
-            .from("notifications")
-            .update(notification)
-            .eq("id", notification.id);
-        if (error) {
-            throw error;
-        }
-        return data;
+    async update(notification: NotificationUpdate) {
+        await db
+            .update(notifications)
+            .set({
+                ...(notification.title !== undefined && { title: notification.title }),
+                ...(notification.content !== undefined && { content: notification.content }),
+                ...(notification.status !== undefined && { status: notification.status }),
+                ...(notification.viewed_by !== undefined && { viewedBy: notification.viewed_by }),
+            })
+            .where(eq(notifications.id, notification.id));
     }
 
     async resend(notificationId: number) {
-        const { data, error } = await this.supabase
-            .from("notifications")
-            .select("*")
-            .eq("id", notificationId);
-        if (error) {
-            throw error;
-        }
+        const [row] = await db
+            .select()
+            .from(notifications)
+            .where(eq(notifications.id, notificationId));
+
+        if (!row) throw new Error("Notification not found");
+
         this.sendNotification({
-            id: data[0].id,
+            id: row.id,
             channel: "push",
-            title: data[0].title ?? "",
-            content: data[0].content ?? "",
-            recipients: data[0].recipients ?? [],
-        }).then(() => {
-            this.update({
-                id: data[0].id,
-                status: "sent",
-                sent_at: new Date().toISOString(),
-            })
+            title: row.title ?? "",
+            content: row.content ?? "",
+            recipients: row.recipients ?? [],
         })
+            .then(() =>
+                db
+                    .update(notifications)
+                    .set({ status: "sent", sentAt: new Date() })
+                    .where(eq(notifications.id, row.id)),
+            )
             .catch((error) => {
                 console.error(error);
-                this.update({
-                    id: data[0].id,
-                    status: "failed",
-                })
+                this.update({ id: row.id, status: "failed" });
             });
     }
 
     async view(id: number, userId: number) {
-        const { data } = await this.supabase
-            .from("notifications")
-            .select("*")
-            .eq("id", id);
-        const notification = data?.[0];
-        const { error } = await this.supabase
-            .from("notifications")
-            .update({ viewed_by: [...notification.viewed_by, userId] })
-            .eq("id", id);
+        const [notification] = await db
+            .select()
+            .from(notifications)
+            .where(eq(notifications.id, id));
 
-        if (error) {
-            throw error;
-        }
+        if (!notification) return;
+
+        const viewedBy = notification.viewedBy ?? [];
+        if (viewedBy.includes(userId.toString())) return;
+
+        await db
+            .update(notifications)
+            .set({ viewedBy: [...viewedBy, userId.toString()] })
+            .where(eq(notifications.id, id));
     }
 
     async sendNotification(notification: SendNotificationProps) {
@@ -160,28 +195,21 @@ export class NotificationsService {
     }
 
     async sendPushNotification(notification: SendNotificationProps) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("expo_push_token")
-            .in(
-                "id",
-                notification.recipients.map((recipient) => Number(recipient)),
-            );
-        if (error) {
-            throw error;
-        }
-        const expoPushTokens = data.map((user) => user.expo_push_token);
-        const messages = expoPushTokens
-            .filter((token) => !!token)
-            .map((token) => ({
-                to: token,
-                sound: "default",
-                title: notification.title,
-                body: notification.content,
-                data: {
-                    notification_id: notification.id,
-                },
-            }));
-        return messages;
+        const recipientIds = notification.recipients.map((r) => Number(r)).filter((n) => !Number.isNaN(n));
+        if (recipientIds.length === 0) return [];
+
+        const userRows = await db
+            .select({ expoPushToken: users.expoPushToken })
+            .from(users)
+            .where(inArray(users.id, recipientIds));
+
+        const expoPushTokens = userRows.map((u) => u.expoPushToken).filter((t): t is string => !!t);
+        return expoPushTokens.map((token) => ({
+            to: token,
+            sound: "default" as const,
+            title: notification.title,
+            body: notification.content,
+            data: { notification_id: notification.id },
+        }));
     }
 }

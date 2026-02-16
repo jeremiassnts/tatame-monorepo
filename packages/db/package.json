@@ -21,7 +21,8 @@
     "migrate:phase-1": "tsx scripts/migrate-phase-1.ts",
     "migrate:phase-2": "tsx scripts/migrate-phase-2.ts",
     "migrate:phase-3": "tsx scripts/migrate-phase-3.ts",
-    "migrate:phase-4": "tsx scripts/migrate-phase-4.ts"
+    "migrate:phase-4": "tsx scripts/migrate-phase-4.ts",
+    "migrate:phase-5": "tsx scripts/migrate-phase-5.ts"
   },
   "dependencies": {
     "@tatame-monorepo/env": "workspace:*",
