@@ -1,90 +1,95 @@
 import { BELT_ORDER } from "@/constants/belt";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { db } from "@tatame-monorepo/db";
+import { users, graduations } from "@tatame-monorepo/db/schema";
+import { eq, and, or, isNull, isNotNull } from "drizzle-orm";
 import { format } from "date-fns";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
-import { SupabaseService } from "../supabase";
-import type { Database } from "../supabase/types";
+
+type User = typeof users.$inferSelect;
+type NewUser = typeof users.$inferInsert;
+type UserUpdate = Partial<Omit<User, "id">> & { id: number };
 
 export class UsersService {
-    private supabase: SupabaseClient;
     private rolesService: RolesService;
     private notificationsService: NotificationsService;
+    
     constructor(accessToken: string) {
-        this.supabase = (new SupabaseService(accessToken)).getClient();
         this.rolesService = new RolesService(accessToken);
         this.notificationsService = new NotificationsService(accessToken);
     }
 
     async create(clerkUserId: string, role: string, email: string, firstName: string, lastName: string, profilePicture: string) {
-        const { data, error } = await this.supabase.from("users").insert({
-            clerk_user_id: clerkUserId,
-            role: role,
-            email: email,
-            first_name: firstName,
-            last_name: lastName,
-            profile_picture: profilePicture,
-            approved_at: this.rolesService.isHigherRole(role) ? new Date().toISOString() : null,
-            migrated_at: new Date().toISOString(),
-        });
-        if (error) {
-            throw error;
-        }
+        const [user] = await db.insert(users).values({
+            clerkUserId,
+            role,
+            email,
+            firstName,
+            lastName,
+            profilePicture,
+            approvedAt: this.rolesService.isHigherRole(role) ? new Date() : null,
+            migratedAt: new Date(),
+        }).returning();
 
-        return data;
+        return user;
     }
 
-    async get(userId: number) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("id", userId);
-        if (error) {
-            throw error;
-        }
-        return data[0];
-    };
+    async get(userId: number): Promise<User | undefined> {
+        return await db.query.users.findFirst({
+            where: eq(users.id, userId),
+        });
+    }
 
-    async getByClerkUserId(clerkUserId: string) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("clerk_user_id", clerkUserId);
-        if (error) {
-            throw error;
-        }
-        return data[0];
-    };
+    async getByClerkUserId(clerkUserId: string): Promise<User | undefined> {
+        return await db.query.users.findFirst({
+            where: eq(users.clerkUserId, clerkUserId),
+        });
+    }
 
     async listStudentsByGymId(gymId: number) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*, graduations(belt, degree)")
-            .eq("gym_id", gymId);
+        // Fetch users with their graduations
+        const studentsWithGraduations = await db
+            .select({
+                user: users,
+                graduation: graduations,
+            })
+            .from(users)
+            .leftJoin(graduations, eq(graduations.userId, users.id))
+            .where(eq(users.gymId, gymId));
 
-        if (error) {
-            throw error;
-        }
-        return data.sort((a, b) => {
+        // Transform to match expected format and sort
+        const result = studentsWithGraduations.map(({ user, graduation }) => ({
+            ...user,
+            graduations: graduation ? {
+                belt: graduation.belt,
+                degree: graduation.degree,
+            } : null,
+            // Add belt and degree at root level for sorting (if graduation exists)
+            belt: graduation?.belt,
+            degree: graduation?.degree,
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        }));
+
+        // Sort by belt, degree, and name
+        return result.sort((a, b) => {
             if (a.belt === b.belt) {
                 if (a.degree === b.degree) {
                     return a.name.localeCompare(b.name);
                 }
-                return b.degree! - a.degree!;
+                return (b.degree ?? 0) - (a.degree ?? 0);
             }
             //@ts-ignore
-            return BELT_ORDER[a.belt] - BELT_ORDER[b.belt];
+            return (BELT_ORDER[a.belt] ?? 0) - (BELT_ORDER[b.belt] ?? 0);
         });
     }
 
     async approveStudent(userId: number) {
-        const { error } = await this.supabase
-            .from("users")
-            .update({ approved_at: new Date().toISOString(), denied_at: null })
-            .eq("id", userId);
-        if (error) {
-            throw error;
-        }
+        await db.update(users)
+            .set({ 
+                approvedAt: new Date(), 
+                deniedAt: null 
+            })
+            .where(eq(users.id, userId));
 
         await this.notificationsService.create({
             title: "Parabéns! Seu cadastro foi aprovado",
@@ -97,13 +102,12 @@ export class UsersService {
     }
 
     async denyStudent(userId: number) {
-        const { error } = await this.supabase
-            .from("users")
-            .update({ denied_at: new Date().toISOString(), approved_at: null })
-            .eq("id", userId);
-        if (error) {
-            throw error;
-        }
+        await db.update(users)
+            .set({ 
+                deniedAt: new Date(), 
+                approvedAt: null 
+            })
+            .where(eq(users.id, userId));
 
         await this.notificationsService.create({
             title: "Que pena! Seu cadastro foi negado",
@@ -115,77 +119,70 @@ export class UsersService {
         });
     }
 
-    async getStudentsApprovalStatus(userId: number) {
+    async getStudentsApprovalStatus(userId: number): Promise<boolean> {
         const role = await this.rolesService.getRoleByUserId(userId);
         if (this.rolesService.isHigherRole(role)) {
             return true;
         }
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("id", userId);
+        
+        const user = await db.query.users.findFirst({
+            where: eq(users.id, userId),
+            columns: {
+                approvedAt: true,
+                deniedAt: true,
+            },
+        });
 
-        if (error) {
-            throw error;
+        if (!user) {
+            return false;
         }
 
-        return data[0].approved_at && !data[0].denied_at;
+        return !!user.approvedAt && !user.deniedAt;
     }
 
-    async update(data: Database["public"]["Tables"]["users"]["Update"]) {
-        const { error } = await this.supabase
-            .from("users")
-            .update(data)
-            .eq("id", data.id);
-        if (error) {
-            throw error;
-        }
+    async update(data: UserUpdate): Promise<void> {
+        const { id, ...updateData } = data;
+        await db.update(users)
+            .set(updateData)
+            .where(eq(users.id, id));
     }
 
-    async delete(userId: string) {
-        const { error } = await this.supabase
-            .from("users")
-            .update({
-                deleted_at: new Date().toISOString(),
-            })
-            .eq("id", userId);
-
-        if (error) {
-            throw error;
-        }
+    async delete(userId: string): Promise<void> {
+        await db.update(users)
+            .set({ deletedAt: new Date() })
+            .where(eq(users.id, Number.parseInt(userId)));
     }
 
     async getBirthdayUsers(date: string) {
         const formatted = format(new Date(), "MM-dd");
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("birth_day", formatted);
+        const birthdayUsers = await db
+            .select()
+            .from(users)
+            .where(eq(users.birthDay, formatted));
 
-        if (error) {
-            throw error;
-        }
-
-        return (data as Database["public"]["Tables"]["users"]["Row"][]).sort(
-            (a, b) => {
-                return (a.first_name ?? "").localeCompare(b.first_name ?? "");
-            },
-        );
+        return birthdayUsers.sort((a, b) => {
+            return (a.firstName ?? "").localeCompare(b.firstName ?? "");
+        });
     }
 
-    async listInstructorsByGymId(gymId: number) {
-        const { data, error } = await this.supabase
-            .from("users")
-            .select("*")
-            .eq("gym_id", gymId)
-            .or(
-                "role.eq.MANAGER,and(role.eq.INSTRUCTOR,approved_at.not.is.null)",
+    async listInstructorsByGymId(gymId: number): Promise<User[]> {
+        // MANAGER or INSTRUCTOR with approved_at not null
+        const instructors = await db
+            .select()
+            .from(users)
+            .where(
+                and(
+                    eq(users.gymId, gymId),
+                    or(
+                        eq(users.role, "MANAGER"),
+                        and(
+                            eq(users.role, "INSTRUCTOR"),
+                            isNotNull(users.approvedAt)
+                        )
+                    )
+                )
             );
 
-        if (error) {
-            throw error;
-        }
-
-        return data
+        return instructors;
     }
 }

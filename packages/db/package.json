@@ -19,7 +19,8 @@
     "db:stop": "docker compose stop",
     "db:down": "docker compose down",
     "migrate:phase-1": "tsx scripts/migrate-phase-1.ts",
-    "migrate:phase-2": "tsx scripts/migrate-phase-2.ts"
+    "migrate:phase-2": "tsx scripts/migrate-phase-2.ts",
+    "migrate:phase-3": "tsx scripts/migrate-phase-3.ts"
   },
   "dependencies": {
     "@tatame-monorepo/env": "workspace:*",
