@@ -38,7 +38,16 @@ classRouter.post("/", async (req, res, next) => {
 
         const validatedBody = createClassSchema.parse(req.body);
         const classService = new ClassService();
-        const classData = await classService.create(validatedBody);
+        const classData = await classService.create({
+            gym_id: validatedBody.gym_id,
+            instructor_id: validatedBody.instructor_id,
+            created_by: validatedBody.created_by ?? null,
+            day: validatedBody.day,
+            start: validatedBody.start,
+            end: validatedBody.end,
+            modality: null,
+            description: validatedBody.description ?? null,
+        });
 
         res.status(201).json({
             data: classData,
