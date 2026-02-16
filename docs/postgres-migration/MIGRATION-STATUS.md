@@ -1,7 +1,7 @@
 # Postgres Migration - Current Status
 
 **Last Updated:** 2026-02-15  
-**Current Phase:** Phase 5 (Notifications) - CODE COMPLETE
+**Current Phase:** Phase 6 (Cutover & Cleanup) - COMPLETE
 
 ---
 
@@ -14,8 +14,8 @@
 ✅ Phase 3: User-Related Tables (CODE COMPLETE - 2026-02-15)
 ✅ Phase 4: Class & Activity Tables (CODE COMPLETE)
 ✅ Phase 5: Notifications Table (CODE COMPLETE - 2026-02-15)
-   ├─► Phase 6: Cutover & Cleanup (NEXT)
-   └─► Data migration scripts: run when Postgres is ready
+✅ Phase 6: Cutover & Cleanup (COMPLETE - 2026-02-15)
+   └─► Data migration scripts (packages/db): run when copying Supabase → Postgres
 ```
 
 ---
@@ -148,7 +148,7 @@ pnpm db:studio         # Verify data
 - ✅ User data and auth complete (Phase 3) ⭐
 - ✅ Activity tables complete (Phase 4)
 - ✅ Notifications migrated to Drizzle (Phase 5)
-- ⏳ Final cutover pending (Phase 6)
+- ✅ Cutover complete – Supabase removed from app (Phase 6)
 
 ---
 

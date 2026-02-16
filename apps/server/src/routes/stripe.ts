@@ -1,5 +1,7 @@
 import { createCustomerSchema, createEphemeralKeySchema, createPaymentIntentSchema, createSetupIntentSchema, createSubscriptionSchema, listProductsSchema } from "@/schemas/stripe";
-import { SupabaseService } from "@/services/supabase";
+import { db } from "@tatame-monorepo/db";
+import { users } from "@tatame-monorepo/db/schema";
+import { eq } from "drizzle-orm";
 import { Router } from "express";
 import { stripeService } from "../services/stripe";
 
@@ -37,12 +39,10 @@ stripeRouter.post("/customers", async (req, res, next) => {
         user_id: validatedBody.userId?.toString(),
       },
     });
-    // Update user with customer_id
-    const supabaseService = new SupabaseService(await req.auth?.getToken() ?? "");
-    await supabaseService.updateUser({
-      id: validatedBody.userId,
-      customer_id: customer?.id,
-    });
+    // Update user with Stripe customer_id
+    if (customer?.id) {
+      await db.update(users).set({ customerId: customer.id }).where(eq(users.id, validatedBody.userId));
+    }
     res.status(201).json({
       data: customer,
       created: true,
@@ -62,11 +62,9 @@ stripeRouter.post("/subscriptions", async (req, res, next) => {
       priceId: validatedBody.priceId,
     });
     // Update user with subscription_id
-    const supabaseService = new SupabaseService(await req.auth?.getToken() ?? "");
-    await supabaseService.updateUser({
-      id: validatedBody.userId,
-      subscription_id: subscription?.id,
-    });
+    if (subscription?.id) {
+      await db.update(users).set({ subscriptionId: subscription.id }).where(eq(users.id, validatedBody.userId));
+    }
     res.status(201).json({
       data: subscription,
       created: true,

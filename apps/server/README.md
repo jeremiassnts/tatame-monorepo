@@ -48,9 +48,11 @@ STRIPE_WEBHOOK_SECRET=whsec_... # See webhook setup guide
 CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
-# Supabase (from https://app.supabase.com/project/_/settings/api)
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-service-role-key
+# Database (Postgres)
+DATABASE_URL=postgresql://...
+
+# Supabase (optional; only for data migration scripts in packages/db)
+# SUPABASE_URL=... SUPABASE_ANON_KEY=...
 
 # Server
 NODE_ENV=development
