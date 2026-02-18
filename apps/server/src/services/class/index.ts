@@ -147,28 +147,6 @@ export class ClassService {
             throw new Error("Failed to create class");
         }
 
-        const students = await db
-            .select()
-            .from(users)
-            .where(
-                and(
-                    eq(users.gymId, classData.gym_id),
-                    eq(users.role, "STUDENT"),
-                ),
-            );
-
-        const approvedStudents = students.filter((s) => s.approvedAt != null);
-
-        await this.notificationsService.create({
-            title: "Nova aula criada",
-            content: "Seu professor cadastrou uma nova aula, venha conferir!",
-            recipients: approvedStudents.map((s) => s.id.toString()),
-            channel: "push",
-            sent_by: classData.created_by ?? created.id,
-            status: "pending",
-            viewed_by: [classData.created_by?.toString() ?? ""],
-        });
-
         return created;
     }
 

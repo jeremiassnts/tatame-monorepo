@@ -1,6 +1,6 @@
 import { db } from "@tatame-monorepo/db";
 import { gyms, users } from "@tatame-monorepo/db/schema";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
 
@@ -68,29 +68,11 @@ export class GymsService {
         if (!updatedUser) {
             throw new Error("Failed to associate gym with user");
         }
-
-        // Check if user is a higher role (INSTRUCTOR or MANAGER)
-        const role = await this.rolesService.getRoleByUserId(userId);
-        if (!this.rolesService.isHigherRole(role ?? "")) {
-            // Find gym manager to notify
-            const manager = await db.query.users.findFirst({
-                where: and(
-                    eq(users.gymId, gymId),
-                    eq(users.role, "MANAGER")
-                ),
-            });
-
-            if (manager) {
-                await this.notificationsService.create({
-                    title: "Novo aluno associado a academia",
-                    content: `Verifique na lista de alunos para aprovar ou negar a associação`,
-                    recipients: [manager.id.toString()],
-                    channel: "push",
-                    status: "pending",
-                    viewed_by: [updatedUser.id.toString()],
-                    sent_by: updatedUser.id,
-                });
-            }
-        }
+    }
+    /** Get gym by id. */
+    async getById(gymId: number): Promise<Gym | undefined> {
+        return await db.query.gyms.findFirst({
+            where: eq(gyms.id, gymId),
+        });
     }
 }

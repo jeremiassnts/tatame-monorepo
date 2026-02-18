@@ -101,3 +101,29 @@ gymsRouter.post("/associate", async (req, res, next) => {
         next(error);
     }
 });
+
+
+// Get gym by id
+gymsRouter.get("/:gymId", async (req, res, next) => {
+    try {
+        const accessToken = await req.auth?.getToken();
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const gymId = Number.parseInt(req.params.gymId, 10);
+        if (Number.isNaN(gymId)) {
+            return res.status(400).json({ error: "Invalid gymId" });
+        }
+
+        const gymsService = new GymsService();
+        const gym = await gymsService.getById(gymId);
+        if (!gym) {
+            return res.status(404).json({ error: "Gym not found" });
+        }
+
+        res.json({ data: gym });
+    } catch (error) {
+        next(error);
+    }
+});

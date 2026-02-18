@@ -104,15 +104,6 @@ export class UsersService {
                 deniedAt: null
             })
             .where(eq(users.id, userId));
-
-        await this.notificationsService.create({
-            title: "Parabéns! Seu cadastro foi aprovado",
-            content: `Aproveite, agora você pode acessar todos os recursos da plataforma!`,
-            recipients: [userId.toString()],
-            channel: "push",
-            status: "pending",
-            viewed_by: [],
-        });
     }
 
     /** Denies a student and sends a notification. */
@@ -123,15 +114,6 @@ export class UsersService {
                 approvedAt: null
             })
             .where(eq(users.id, userId));
-
-        await this.notificationsService.create({
-            title: "Que pena! Seu cadastro foi negado",
-            content: `Por favor, contate o suporte para mais informações`,
-            recipients: [userId.toString()],
-            channel: "push",
-            status: "pending",
-            viewed_by: [],
-        });
     }
 
     /** Returns true if the user is approved (or has a higher role that doesn't require approval). */
