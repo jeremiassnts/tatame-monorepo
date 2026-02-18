@@ -8,13 +8,12 @@
  * Run with: pnpm migrate:phase-1
  */
 
-import { db } from "../src/index.js";
+// Load env first so DATABASE_URL is set before db (Drizzle) is created
+import "./load-env.js";
+import { sql } from "drizzle-orm";
+import { db, checkDatabaseConnection } from "../src/index.js";
 import { roles, versions, appStores } from "../src/schema/index.js";
 import { createClient } from "@supabase/supabase-js";
-import * as dotenv from "dotenv";
-
-// Load environment variables
-dotenv.config({ path: "../../apps/server/.env" });
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
@@ -155,6 +154,38 @@ async function migrateAppStores() {
 }
 
 /**
+ * Check that Postgres is reachable and required tables exist
+ */
+async function ensurePostgresReady(): Promise<void> {
+  const ok = await checkDatabaseConnection();
+  if (!ok) {
+    const url = process.env.DATABASE_URL;
+    const hint = url
+      ? "Check that Postgres is running and reachable (firewall, VPN)."
+      : "DATABASE_URL is not set. Ensure apps/server/.env is loaded (load-env.js runs first).";
+    throw new Error(
+      `Cannot connect to Postgres. ${hint} ECONNREFUSED usually means the server is down or unreachable.`
+    );
+  }
+  // Check that required tables exist before inserting (avoid "relation does not exist")
+  const requiredTables = ["roles", "versions", "app_stores"];
+  for (const table of requiredTables) {
+    const res = await db.execute(
+      sql`SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = ${table}
+      ) AS "exists"`
+    );
+    const rows = (res as unknown as { rows: { exists: boolean }[] }).rows;
+    if (!rows[0]?.exists) {
+      throw new Error(
+        `Table "public.${table}" does not exist in Postgres. Run schema migration (e.g. drizzle-kit push) first.`
+      );
+    }
+  }
+}
+
+/**
  * Main migration function
  */
 async function main() {
@@ -166,6 +197,7 @@ async function main() {
   console.log("Dependencies: None\n");
   
   try {
+    await ensurePostgresReady();
     // Migrate each table
     const rolesResult = await migrateRoles();
     const versionsResult = await migrateVersions();

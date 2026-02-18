@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { authMiddleware, requireAuth } from "../middleware/auth";
+import { appStoresRouter } from "./app-stores";
+import { assetsRouter } from "./assets";
 import { attachmentsRouter } from "./attachments";
 import { checkinsRouter } from "./checkins";
 import { classRouter } from "./class";
@@ -29,6 +31,8 @@ protectedRoutes.use("/checkins", checkinsRouter);
 protectedRoutes.use("/notifications", notificationsRouter);
 protectedRoutes.use("/graduations", graduationsRouter);
 protectedRoutes.use("/versions", versionsRouter);
+protectedRoutes.use("/app-stores", appStoresRouter);
+protectedRoutes.use("/assets", assetsRouter);
 protectedRoutes.use("/attachments", attachmentsRouter);
 
 export default protectedRoutes;

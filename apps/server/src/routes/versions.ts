@@ -3,14 +3,9 @@ import { Router } from "express";
 
 export const versionsRouter: Router = Router();
 
-// Get current version
-versionsRouter.get("/", async (req, res, next) => {
+// Get current version (public)
+versionsRouter.get("/", async (_, res, next) => {
     try {
-        const accessToken = await req.auth?.getToken();
-        if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
         const versionsService = new VersionsService();
         const version = await versionsService.get();
 

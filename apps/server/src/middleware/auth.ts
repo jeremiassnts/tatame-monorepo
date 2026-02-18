@@ -20,7 +20,7 @@ export const authMiddleware: RequestHandler = clerkMiddleware({
 const TEST_USER_ID_HEADER = "X-Test-User-Id";
 
 export const requireAuth: RequestHandler = (req, res, next) => {
-  if (req.path.startsWith("/webhooks")) {
+  if (req.path.startsWith("/webhooks") || req.path.startsWith("/versions") || req.path.startsWith("/app-stores")) {
     return next();
   }
 

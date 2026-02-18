@@ -28,3 +28,7 @@ export const approveStudentSchema = z.object({
 export const denyStudentSchema = z.object({
     userId: z.number(),
 });
+
+export const updateExpoPushTokenSchema = z.object({
+    expoPushToken: z.string(),
+});

@@ -1,4 +1,4 @@
-import { approveStudentSchema, createUserSchema, denyStudentSchema, updateUserSchema } from "@/schemas/users";
+import { approveStudentSchema, createUserSchema, denyStudentSchema, updateExpoPushTokenSchema, updateUserSchema } from "@/schemas/users";
 import { UsersService } from "@/services/users";
 import { Router } from "express";
 import multer from "multer";
@@ -301,6 +301,55 @@ usersRouter.delete("/:userId", async (req, res, next) => {
         res.json({
             success: true,
             message: "User deleted successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Find users notification recipients
+usersRouter.get("/:userId/notification-recipients", async (req, res, next) => {
+    try {
+        const accessToken = await req.auth?.getToken();
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const { recipientIds } = req.query as { recipientIds: string[] };
+        if (!recipientIds) {
+            return res.status(400).json({ error: "Missing recipientIds" });
+        }
+
+        const usersService = new UsersService();
+        const recipients = await usersService.findNotificationRecipients(recipientIds.map(Number));
+        res.json({
+            data: recipients,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Update expo push token
+usersRouter.patch("/:userId/expo-push-token", async (req, res, next) => {
+    try {
+        const accessToken = await req.auth?.getToken();
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const userId = Number.parseInt(req.params.userId, 10);
+        if (Number.isNaN(userId)) {
+            return res.status(400).json({ error: "Invalid userId" });
+        }
+
+        const validatedBody = updateExpoPushTokenSchema.parse(req.body);
+        const usersService = new UsersService();
+        await usersService.updateExpoPushToken(userId, validatedBody.expoPushToken);
+
+        res.json({
+            success: true,
+            message: "Expo push token updated successfully",
         });
     } catch (error) {
         next(error);

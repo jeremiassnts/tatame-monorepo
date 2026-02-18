@@ -4,7 +4,7 @@ import { db } from "@tatame-monorepo/db";
 import { graduations, users } from "@tatame-monorepo/db/schema";
 import { env } from "@tatame-monorepo/env/server";
 import { format } from "date-fns";
-import { and, eq, isNotNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
 import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
 
@@ -228,6 +228,23 @@ export class UsersService {
             name: getNameFromClerk(u),
             image_url: user.imageUrl ?? "",
         };
+    }
+
+    /** Finds users notification recipients by user id. */
+    async findNotificationRecipients(recipientIds: number[]) {
+        const recipients = await db
+            .select({ expoPushToken: users.expoPushToken })
+            .from(users)
+            .where(inArray(users.id, recipientIds));
+
+        return recipients;
+    }
+
+    /** Update expo push token by user id. */
+    async updateExpoPushToken(userId: number, expoPushToken: string) {
+        await db.update(users)
+            .set({ expoPushToken })
+            .where(eq(users.id, userId));
     }
 }
 
