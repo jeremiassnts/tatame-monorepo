@@ -3,7 +3,6 @@ import { GymsService } from "@/services/gyms";
 
 const mockFindFirstGyms = jest.fn();
 const mockFindFirstUsers = jest.fn();
-const mockWhere = jest.fn();
 const mockReturning = jest.fn();
 const mockValues = jest.fn();
 const mockFrom = jest.fn();
@@ -11,7 +10,6 @@ const mockSelect = jest.fn();
 const mockInsert = jest.fn();
 const mockUpdate = jest.fn();
 
-const mockCreateNotification = jest.fn();
 const mockGetRoleByUserId = jest.fn();
 const mockIsHigherRole = jest.fn();
 
@@ -39,18 +37,11 @@ jest.mock("@/services/roles", () => ({
   })),
 }));
 
-jest.mock("@/services/notifications", () => ({
-  NotificationsService: jest.fn().mockImplementation(() => ({
-    create: mockCreateNotification,
-  })),
-}));
-
 describe("GymsService", () => {
   const service = new GymsService();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateNotification.mockResolvedValue({});
     mockUpdate.mockReturnValue({
       set: () => ({
         where: () => ({
@@ -120,7 +111,7 @@ describe("GymsService", () => {
   });
 
   describe("associate", () => {
-    it("associates gym to user and notifies manager when user is STUDENT", async () => {
+    it("associates gym to user", async () => {
       const updatedUser = { id: 5, gymId: 1, role: "STUDENT" };
       const manager = { id: 1, gymId: 1, role: "MANAGER" };
       mockReturning.mockResolvedValue([updatedUser]);
@@ -131,15 +122,9 @@ describe("GymsService", () => {
       await service.associate(1, 5);
 
       expect(mockUpdate).toHaveBeenCalled();
-      expect(mockCreateNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Novo aluno associado a academia",
-          recipients: ["1"],
-        })
-      );
     });
 
-    it("associates gym to user without notification when user is MANAGER", async () => {
+    it("associates gym to user when user is MANAGER", async () => {
       const updatedUser = { id: 1, gymId: 1, role: "MANAGER" };
       mockReturning.mockResolvedValue([updatedUser]);
       mockGetRoleByUserId.mockResolvedValueOnce("MANAGER");
@@ -148,7 +133,6 @@ describe("GymsService", () => {
       await service.associate(1, 1);
 
       expect(mockUpdate).toHaveBeenCalled();
-      expect(mockCreateNotification).not.toHaveBeenCalled();
     });
 
     it("throws when update returns no user", async () => {
@@ -157,7 +141,7 @@ describe("GymsService", () => {
       await expect(service.associate(1, 999)).rejects.toThrow("Failed to associate gym with user");
     });
 
-    it("associates without notification when no manager found", async () => {
+    it("associates when no manager found", async () => {
       const updatedUser = { id: 5, gymId: 1, role: "STUDENT" };
       mockReturning.mockResolvedValue([updatedUser]);
       mockGetRoleByUserId.mockResolvedValueOnce("STUDENT");
@@ -167,7 +151,6 @@ describe("GymsService", () => {
       await service.associate(1, 5);
 
       expect(mockUpdate).toHaveBeenCalled();
-      expect(mockCreateNotification).not.toHaveBeenCalled();
     });
   });
 });

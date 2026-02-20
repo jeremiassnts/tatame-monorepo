@@ -1,14 +1,14 @@
 /// <reference types="jest" />
+import { createApp } from "@/app";
+import { db } from "@tatame-monorepo/db";
+import { gyms, roles, users } from "@tatame-monorepo/db/schema";
 import {
   clearTestData,
   setupTestDatabase,
   teardownTestDatabase,
 } from "@tatame-monorepo/db/test-utils";
-import { gyms, roles, users } from "@tatame-monorepo/db/schema";
-import { db } from "@tatame-monorepo/db";
 import { eq } from "drizzle-orm";
 import request from "supertest";
-import { createApp } from "@/app";
 
 const TEST_USER_ID = "test_e2e_gyms";
 
@@ -206,7 +206,7 @@ describe("gyms (e2e)", () => {
         .set(auth())
         .expect(200);
 
-      expect(res.body.data).toBeUndefined();
+      expect(res.body.data).toBeNull();
     });
   });
 

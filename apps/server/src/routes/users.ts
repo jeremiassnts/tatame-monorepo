@@ -108,7 +108,7 @@ usersRouter.get("/clerk/:clerkUserId", async (req, res, next) => {
         const user = await usersService.getByClerkUserId(clerkUserId);
 
         res.json({
-            data: user,
+            data: user ?? null,
         });
     } catch (error) {
         next(error);
@@ -174,8 +174,7 @@ usersRouter.get("/birthdays/today", async (req, res, next) => {
         }
 
         const usersService = new UsersService();
-        const users = await usersService.getBirthdayUsers(new Date().toISOString());
-
+        const users = await usersService.getBirthdayUsers();
         res.json({
             data: users,
             count: users.length,

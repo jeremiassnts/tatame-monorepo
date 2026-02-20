@@ -2,16 +2,10 @@ import { db } from "@tatame-monorepo/db";
 import { assets, classTable, gyms, users } from "@tatame-monorepo/db/schema";
 import { addDays, format, isBefore, set } from "date-fns";
 import { and, eq, gte, isNull, lte } from "drizzle-orm";
-import { NotificationsService } from "../notifications";
 
 /** Service for class schedule CRUD, next-class calculation, and check-in lookup. */
 export class ClassService {
-    private notificationsService: NotificationsService;
-
-    constructor() {
-        this.notificationsService = new NotificationsService();
-    }
-
+    constructor() { }
     /** Returns the next upcoming class for the gym (by day and start time), with instructor name and assets. */
     async nextClass(gymId: number) {
         const data = await db
@@ -117,7 +111,6 @@ export class ClassService {
             instructor_name: instructor,
         };
     }
-
     /** Creates a class and notifies approved students of the gym. */
     async create(classData: {
         gym_id: number;

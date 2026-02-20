@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 jest.mock("@tatame-monorepo/env/server", () => ({ env: {} }));
 import { UsersService } from "@/services/users";
+import { format, subDays } from "date-fns";
 
 const mockFindFirstUsers = jest.fn();
-const mockFindFirstGraduations = jest.fn();
 const mockWhere = jest.fn();
 const mockReturning = jest.fn();
 const mockValues = jest.fn();
@@ -13,7 +13,6 @@ const mockInsert = jest.fn();
 const mockUpdate = jest.fn();
 const mockLeftJoin = jest.fn();
 
-const mockCreateNotification = jest.fn();
 const mockGetRoleByUserId = jest.fn();
 const mockIsHigherRole = jest.fn();
 
@@ -40,18 +39,11 @@ jest.mock("@/services/roles", () => ({
   })),
 }));
 
-jest.mock("@/services/notifications", () => ({
-  NotificationsService: jest.fn().mockImplementation(() => ({
-    create: mockCreateNotification,
-  })),
-}));
-
 describe("UsersService", () => {
   const service = new UsersService();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateNotification.mockResolvedValue({});
     mockUpdate.mockReturnValue({
       set: (s: unknown) => ({ where: (...args: unknown[]) => mockWhere(...args) }),
     });
@@ -161,34 +153,22 @@ describe("UsersService", () => {
   });
 
   describe("approveStudent", () => {
-    it("updates user and sends approval notification", async () => {
+    it("updates user to approved", async () => {
       mockWhere.mockResolvedValueOnce(undefined);
 
       await service.approveStudent(1);
 
       expect(mockUpdate).toHaveBeenCalled();
-      expect(mockCreateNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Parabéns! Seu cadastro foi aprovado",
-          recipients: ["1"],
-        })
-      );
     });
   });
 
   describe("denyStudent", () => {
-    it("updates user and sends denial notification", async () => {
+    it("updates user to denied", async () => {
       mockWhere.mockResolvedValueOnce(undefined);
 
       await service.denyStudent(1);
 
       expect(mockUpdate).toHaveBeenCalled();
-      expect(mockCreateNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Que pena! Seu cadastro foi negado",
-          recipients: ["1"],
-        })
-      );
     });
   });
 
@@ -254,16 +234,16 @@ describe("UsersService", () => {
   });
 
   describe("getBirthdayUsers", () => {
-    it("returns users with matching birthDay", async () => {
+    it("returns users with birthday today", async () => {
       const birthdayUsers = [
-        { id: 1, birthDay: "01-15", firstName: "Alice", lastName: "A" },
-        { id: 2, birthDay: "01-15", firstName: "Bob", lastName: "B" },
+        { id: 1, birthDay: format(new Date(), "MM-dd"), firstName: "Alice", lastName: "A" },
+        { id: 2, birthDay: format(subDays(new Date(), 1), "MM-dd"), firstName: "Bob", lastName: "B" },
       ];
       mockWhere.mockResolvedValueOnce(birthdayUsers);
       mockFrom.mockReturnValue({ where: (...args: unknown[]) => mockWhere(...args) });
       mockSelect.mockReturnValue({ from: () => mockFrom() });
 
-      const result = await service.getBirthdayUsers("01-15");
+      const result = await service.getBirthdayUsers();
 
       expect(result).toHaveLength(2);
     });

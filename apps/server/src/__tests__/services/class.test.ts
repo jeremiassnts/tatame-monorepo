@@ -2,17 +2,12 @@
 import { ClassService } from "@/services/class";
 
 const mockWhere = jest.fn();
-const mockOrderBy = jest.fn();
 const mockReturning = jest.fn();
 const mockValues = jest.fn();
-const mockSet = jest.fn();
 const mockFrom = jest.fn();
 const mockSelect = jest.fn();
 const mockInsert = jest.fn();
 const mockUpdate = jest.fn();
-const mockLeftJoin = jest.fn();
-
-const mockCreateNotification = jest.fn();
 
 jest.mock("@tatame-monorepo/db", () => ({
   db: {
@@ -24,18 +19,11 @@ jest.mock("@tatame-monorepo/db", () => ({
   },
 }));
 
-jest.mock("@/services/notifications", () => ({
-  NotificationsService: jest.fn().mockImplementation(() => ({
-    create: mockCreateNotification,
-  })),
-}));
-
 describe("ClassService", () => {
   const service = new ClassService();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateNotification.mockResolvedValue({});
     mockUpdate.mockReturnValue({ set: (s: unknown) => ({ where: (...args: unknown[]) => mockWhere(...args) }) });
   });
 
@@ -111,7 +99,7 @@ describe("ClassService", () => {
   });
 
   describe("create", () => {
-    it("creates class and sends notification to approved students", async () => {
+    it("creates class", async () => {
       const classData = { gym_id: 1, instructor_id: 1, created_by: 1, day: "MONDAY", start: "18:00", end: "19:30", modality: "BJJ", description: null };
       const created = { id: 1, ...classData, gymId: 1, instructorId: 1, createdAt: new Date(), deletedAt: null, createdBy: 1 };
       const students = [{ id: 1, approvedAt: new Date(), role: "STUDENT", gymId: 1 }];
@@ -134,13 +122,6 @@ describe("ClassService", () => {
       const result = await service.create(classData);
 
       expect(result).toEqual(created);
-      expect(mockCreateNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Nova aula criada",
-          content: "Seu professor cadastrou uma nova aula, venha conferir!",
-          channel: "push",
-        })
-      );
     });
 
     it("throws when create returns nothing", async () => {
@@ -184,7 +165,12 @@ describe("ClassService", () => {
   describe("getToCheckIn", () => {
     it("returns class when time is within start and end", async () => {
       const cls = { id: 1, gymId: 1, day: "MONDAY", start: "18:00", end: "19:30" };
-      mockWhere.mockResolvedValueOnce([cls]);
+      const selectChain = {
+        from: () => ({
+          where: () => Promise.resolve([cls]),
+        }),
+      };
+      mockSelect.mockReturnValue(selectChain);
 
       const result = await service.getToCheckIn(1, "18:30", "MONDAY");
 
@@ -192,7 +178,12 @@ describe("ClassService", () => {
     });
 
     it("returns null when no class matches", async () => {
-      mockWhere.mockResolvedValueOnce([]);
+      const selectChain = {
+        from: () => ({
+          where: () => Promise.resolve([]),
+        }),
+      };
+      mockSelect.mockReturnValue(selectChain);
 
       const result = await service.getToCheckIn(1, "20:00", "MONDAY");
 

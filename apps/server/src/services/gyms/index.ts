@@ -1,22 +1,13 @@
 import { db } from "@tatame-monorepo/db";
 import { gyms, users } from "@tatame-monorepo/db/schema";
 import { eq } from "drizzle-orm";
-import { NotificationsService } from "../notifications";
-import { RolesService } from "../roles";
 
 /** Service for gym CRUD and user–gym association. */
 type NewGym = typeof gyms.$inferInsert;
 type Gym = typeof gyms.$inferSelect;
 
 export class GymsService {
-    private rolesService: RolesService;
-    private notificationsService: NotificationsService;
-
-    constructor() {
-        this.rolesService = new RolesService();
-        this.notificationsService = new NotificationsService();
-    }
-
+    constructor() { }
     /**
      * Create a gym and associate it with the user
      */
@@ -45,7 +36,7 @@ export class GymsService {
         const gym = await db.query.gyms.findFirst({
             where: eq(gyms.managerId, userId),
         });
-        return gym;
+        return gym
     }
 
     /**

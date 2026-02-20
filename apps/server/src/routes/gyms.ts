@@ -74,7 +74,7 @@ gymsRouter.get("/user/:userId", async (req, res, next) => {
         const gym = await gymsService.getByUserId(userId);
 
         res.json({
-            data: gym,
+            data: gym ?? null,
         });
     } catch (error) {
         next(error);

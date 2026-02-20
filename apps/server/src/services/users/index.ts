@@ -5,7 +5,6 @@ import { graduations, users } from "@tatame-monorepo/db/schema";
 import { env } from "@tatame-monorepo/env/server";
 import { format } from "date-fns";
 import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
-import { NotificationsService } from "../notifications";
 import { RolesService } from "../roles";
 
 export interface MinimalProfileResponse {
@@ -21,11 +20,9 @@ type UserUpdate = Partial<Omit<User, "id">> & { id: number };
 /** Service for user CRUD, approval workflow, and user listing by gym. */
 export class UsersService {
     private rolesService: RolesService;
-    private notificationsService: NotificationsService;
 
     constructor() {
         this.rolesService = new RolesService();
-        this.notificationsService = new NotificationsService();
     }
 
     /** Creates a new user and auto-approves if role is MANAGER. */
@@ -154,16 +151,17 @@ export class UsersService {
     }
 
     /** Returns users whose birthDay (MM-DD) matches today's date. */
-    async getBirthdayUsers(date: string) {
+    async getBirthdayUsers() {
         const formatted = format(new Date(), "MM-dd");
         const birthdayUsers = await db
             .select()
             .from(users)
             .where(eq(users.birthDay, formatted));
 
-        return birthdayUsers.sort((a, b) => {
+        const result = birthdayUsers.sort((a, b) => {
             return (a.firstName ?? "").localeCompare(b.firstName ?? "");
         });
+        return result;
     }
 
     /** Lists MANAGER and approved INSTRUCTOR users for the given gym. */
