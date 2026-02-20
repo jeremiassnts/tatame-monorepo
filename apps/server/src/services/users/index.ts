@@ -92,27 +92,6 @@ export class UsersService {
             return (BELT_ORDER[a.belt] ?? 0) - (BELT_ORDER[b.belt] ?? 0);
         });
     }
-
-    /** Approves a student and sends a success notification. */
-    async approveStudent(userId: number) {
-        await db.update(users)
-            .set({
-                approvedAt: new Date(),
-                deniedAt: null
-            })
-            .where(eq(users.id, userId));
-    }
-
-    /** Denies a student and sends a notification. */
-    async denyStudent(userId: number) {
-        await db.update(users)
-            .set({
-                deniedAt: new Date(),
-                approvedAt: null
-            })
-            .where(eq(users.id, userId));
-    }
-
     /** Returns true if the user is approved (or has a higher role that doesn't require approval). */
     async getStudentsApprovalStatus(userId: number): Promise<boolean> {
         const role = await this.rolesService.getRoleByUserId(userId);
@@ -134,7 +113,6 @@ export class UsersService {
 
         return !!user.approvedAt && !user.deniedAt;
     }
-
     /** Updates user fields by id. */
     async update(data: UserUpdate): Promise<void> {
         const { id, ...updateData } = data;
@@ -142,7 +120,6 @@ export class UsersService {
             .set(updateData)
             .where(eq(users.id, id));
     }
-
     /** Soft-deletes a user by setting deletedAt. */
     async delete(userId: string): Promise<void> {
         await db.update(users)
@@ -218,13 +195,6 @@ export class UsersService {
             .where(inArray(users.id, recipientIds));
 
         return recipients;
-    }
-
-    /** Update expo push token by user id. */
-    async updateExpoPushToken(userId: number, expoPushToken: string) {
-        await db.update(users)
-            .set({ expoPushToken })
-            .where(eq(users.id, userId));
     }
 }
 

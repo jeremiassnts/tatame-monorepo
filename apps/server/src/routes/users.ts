@@ -1,4 +1,4 @@
-import { approveStudentSchema, createUserSchema, denyStudentSchema, updateExpoPushTokenSchema, updateUserSchema } from "@/schemas/users";
+import { createUserSchema, updateUserSchema } from "@/schemas/users";
 import { UsersService } from "@/services/users";
 import { Router } from "express";
 import multer from "multer";
@@ -184,48 +184,6 @@ usersRouter.get("/birthdays/today", async (req, res, next) => {
     }
 });
 
-// Approve student
-usersRouter.post("/approve", async (req, res, next) => {
-    try {
-        const accessToken = await req.auth?.getToken();
-        if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const validatedBody = approveStudentSchema.parse(req.body);
-        const usersService = new UsersService();
-        await usersService.approveStudent(validatedBody.userId);
-
-        res.json({
-            success: true,
-            message: "Student approved successfully",
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Deny student
-usersRouter.post("/deny", async (req, res, next) => {
-    try {
-        const accessToken = await req.auth?.getToken();
-        if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const validatedBody = denyStudentSchema.parse(req.body);
-        const usersService = new UsersService();
-        await usersService.denyStudent(validatedBody.userId);
-
-        res.json({
-            success: true,
-            message: "Student denied successfully",
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
 // Get student approval status
 usersRouter.get("/:userId/approval-status", async (req, res, next) => {
     try {
@@ -266,14 +224,24 @@ usersRouter.put("/:userId", async (req, res, next) => {
         const validatedBody = updateUserSchema.parse({ ...req.body, id: userId });
         const usersService = new UsersService();
         const updateData: Record<string, unknown> = { id: validatedBody.id };
-        if (validatedBody.first_name !== undefined) updateData.firstName = validatedBody.first_name;
-        if (validatedBody.last_name !== undefined) updateData.lastName = validatedBody.last_name;
+        if (validatedBody.clerkUserId !== undefined) updateData.clerkUserId = validatedBody.clerkUserId;
         if (validatedBody.email !== undefined) updateData.email = validatedBody.email;
+        if (validatedBody.firstName !== undefined) updateData.firstName = validatedBody.firstName;
+        if (validatedBody.lastName !== undefined) updateData.lastName = validatedBody.lastName;
+        if (validatedBody.profilePicture !== undefined) updateData.profilePicture = validatedBody.profilePicture;
+        if (validatedBody.birth !== undefined) updateData.birth = validatedBody.birth;
+        if (validatedBody.birthDay !== undefined) updateData.birthDay = validatedBody.birthDay;
+        if (validatedBody.gender !== undefined) updateData.gender = validatedBody.gender;
         if (validatedBody.phone !== undefined) updateData.phone = validatedBody.phone;
-        if (validatedBody.birth_day !== undefined) updateData.birthDay = validatedBody.birth_day;
-        if (validatedBody.profile_picture !== undefined) updateData.profilePicture = validatedBody.profile_picture;
-        if (validatedBody.gym_id !== undefined) updateData.gymId = validatedBody.gym_id;
-        if (validatedBody.role !== undefined) updateData.role = validatedBody.role;
+        if (validatedBody.instagram !== undefined) updateData.instagram = validatedBody.instagram;
+        if (validatedBody.gymId !== undefined) updateData.gymId = validatedBody.gymId;
+        if (validatedBody.expoPushToken !== undefined) updateData.expoPushToken = validatedBody.expoPushToken;
+        if (validatedBody.customerId !== undefined) updateData.customerId = validatedBody.customerId;
+        if (validatedBody.subscriptionId !== undefined) updateData.subscriptionId = validatedBody.subscriptionId;
+        if (validatedBody.plan !== undefined) updateData.plan = validatedBody.plan;
+        if (validatedBody.approvedAt !== undefined) updateData.approvedAt = validatedBody.approvedAt;
+        if (validatedBody.deniedAt !== undefined) updateData.deniedAt = validatedBody.deniedAt;
+        if (validatedBody.migratedAt !== undefined) updateData.migratedAt = validatedBody.migratedAt;
         await usersService.update(updateData as { id: number } & Record<string, unknown>);
 
         res.json({
@@ -323,32 +291,6 @@ usersRouter.get("/:userId/notification-recipients", async (req, res, next) => {
         const recipients = await usersService.findNotificationRecipients(recipientIds.map(Number));
         res.json({
             data: recipients,
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Update expo push token
-usersRouter.patch("/:userId/expo-push-token", async (req, res, next) => {
-    try {
-        const accessToken = await req.auth?.getToken();
-        if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const userId = Number.parseInt(req.params.userId, 10);
-        if (Number.isNaN(userId)) {
-            return res.status(400).json({ error: "Invalid userId" });
-        }
-
-        const validatedBody = updateExpoPushTokenSchema.parse(req.body);
-        const usersService = new UsersService();
-        await usersService.updateExpoPushToken(userId, validatedBody.expoPushToken);
-
-        res.json({
-            success: true,
-            message: "Expo push token updated successfully",
         });
     } catch (error) {
         next(error);
