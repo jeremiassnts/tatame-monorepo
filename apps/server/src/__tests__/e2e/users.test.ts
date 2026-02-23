@@ -226,6 +226,65 @@ describe("users (e2e)", () => {
     });
   });
 
+  describe("GET /api/users/notification-recipients", () => {
+    it("returns 401 when no auth", async () => {
+      await request(app)
+        .get("/api/users/notification-recipients")
+        .query({ recipientIds: [seedManager.id] })
+        .expect(401);
+    });
+
+    it("returns 400 when recipientIds missing", async () => {
+      await request(app)
+        .get("/api/users/notification-recipients")
+        .set(auth())
+        .expect(400);
+    });
+
+    it("returns 400 when recipientIds invalid", async () => {
+      await request(app)
+        .get("/api/users/notification-recipients")
+        .set(auth())
+        .query({ recipientIds: "not-a-number" })
+        .expect(400);
+    });
+
+    it("returns recipients for comma-separated recipientIds", async () => {
+      await db
+        .update(users)
+        .set({ expoPushToken: "ExponentPushToken[test-token]" })
+        .where(eq(users.id, seedManager.id));
+
+      const res = await request(app)
+        .get("/api/users/notification-recipients")
+        .set(auth())
+        .query({ recipientIds: `${seedManager.id},${seedStudent.id}` })
+        .expect(200);
+
+      expect(res.body.data).toBeDefined();
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.count).toBe(2);
+      const withToken = res.body.data.find(
+        (r: { expoPushToken: string }) => r.expoPushToken === "ExponentPushToken[test-token]"
+      );
+      expect(withToken).toBeDefined();
+    });
+
+    it("returns recipients for repeated recipientIds query param", async () => {
+      const res = await request(app)
+        .get("/api/users/notification-recipients")
+        .set(auth())
+        .query({ recipientIds: [seedManager.id, seedStudent.id] })
+        .expect(200);
+
+      expect(res.body.data).toBeDefined();
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.count).toBe(2);
+    });
+  });
+
   describe("GET /api/users/birthdays/today", () => {
     it("returns 401 when no auth", async () => {
       await request(app).get("/api/users/birthdays/today").expect(401);

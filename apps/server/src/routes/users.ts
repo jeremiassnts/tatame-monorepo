@@ -35,6 +35,36 @@ usersRouter.post("/", async (req, res, next) => {
     }
 });
 
+// Find users notification recipients (expo push tokens by user ids)
+usersRouter.get("/notification-recipients", async (req, res, next) => {
+    try {
+        const accessToken = await req.auth?.getToken();
+        if (!accessToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const raw = req.query.recipientIds;
+        const recipientIds: number[] = Array.isArray(raw)
+            ? raw.map((id) => Number.parseInt(String(id), 10))
+            : typeof raw === "string"
+              ? raw.split(",").map((id) => Number.parseInt(id.trim(), 10))
+              : [];
+        const validIds = recipientIds.filter((id) => !Number.isNaN(id));
+        if (validIds.length === 0) {
+            return res.status(400).json({ error: "Missing or invalid recipientIds (comma-separated or repeated query param)" });
+        }
+
+        const usersService = new UsersService();
+        const recipients = await usersService.findNotificationRecipients(validIds);
+        res.json({
+            data: recipients,
+            count: recipients.length,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 // Get user by id
 usersRouter.get("/:userId", async (req, res, next) => {
     try {
@@ -268,29 +298,6 @@ usersRouter.delete("/:userId", async (req, res, next) => {
         res.json({
             success: true,
             message: "User deleted successfully",
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Find users notification recipients
-usersRouter.get("/:userId/notification-recipients", async (req, res, next) => {
-    try {
-        const accessToken = await req.auth?.getToken();
-        if (!accessToken) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const { recipientIds } = req.query as { recipientIds: string[] };
-        if (!recipientIds) {
-            return res.status(400).json({ error: "Missing recipientIds" });
-        }
-
-        const usersService = new UsersService();
-        const recipients = await usersService.findNotificationRecipients(recipientIds.map(Number));
-        res.json({
-            data: recipients,
         });
     } catch (error) {
         next(error);
