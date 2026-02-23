@@ -35,7 +35,11 @@ attachmentsRouter.post("/image", upload.single("file"), async (req, res, next) =
             file.originalname || "upload",
         );
 
-        res.status(200).json(result);
+        res.status(200).json({
+            data: {
+                url: result.url,
+            },
+        });
     } catch (error) {
         if (error instanceof Error && error.message.includes("Missing required environment")) {
             return res.status(500).json({ error: "Missing required environment variables" });
