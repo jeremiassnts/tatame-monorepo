@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 /** Service for gym CRUD and user–gym association. */
 type NewGym = typeof gyms.$inferInsert;
 type Gym = typeof gyms.$inferSelect;
-
+type GymUpdate = Partial<Omit<Gym, "id">> & { id: number };
 export class GymsService {
     constructor() { }
     /**
@@ -65,5 +65,12 @@ export class GymsService {
         return await db.query.gyms.findFirst({
             where: eq(gyms.id, gymId),
         });
+    }
+    /** Update gym */
+    async update(data: GymUpdate): Promise<void> {
+        const { id, ...updateData } = data;
+        await db.update(gyms)
+            .set(updateData)
+            .where(eq(gyms.id, id));
     }
 }
