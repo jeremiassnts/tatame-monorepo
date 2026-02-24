@@ -108,14 +108,14 @@ export class ClassService {
 
         return {
             ...nextClass,
-            instructor_name: instructor,
+            instructorName: instructor,
         };
     }
     /** Creates a class and notifies approved students of the gym. */
     async create(classData: {
-        gym_id: number;
-        instructor_id: number | null;
-        created_by: number | null;
+        gymId: number;
+        instructorId: number | null;
+        createdBy: number | null;
         day: string | null;
         start: string | null;
         end: string | null;
@@ -125,9 +125,9 @@ export class ClassService {
         const [created] = await db
             .insert(classTable)
             .values({
-                gymId: classData.gym_id,
-                instructorId: classData.instructor_id,
-                createdBy: classData.created_by,
+                gymId: classData.gymId,
+                instructorId: classData.instructorId,
+                createdBy: classData.createdBy,
                 day: classData.day,
                 start: classData.start,
                 end: classData.end,
@@ -212,12 +212,12 @@ export class ClassService {
         }
 
         return Array.from(classMap.values()).map((item) => {
-            const instructor_name = item.instructor
+            const instructorName = item.instructor
                 ? `${item.instructor.firstName ?? ""} ${item.instructor.lastName ?? ""}`.trim()
                 : "";
             return {
                 ...item,
-                instructor_name,
+                instructorName,
             };
         });
     }
@@ -289,20 +289,20 @@ export class ClassService {
         }
 
         const cls = Array.from(classMap.values())[0];
-        const instructor_name = cls?.instructor
+        const instructorName = cls?.instructor
             ? `${cls?.instructor.firstName ?? ""} ${cls?.instructor.lastName ?? ""}`.trim()
             : "";
 
         return {
             ...cls,
-            instructor_name,
+            instructorName,
         };
     }
 
-    /** Updates class fields by id (instructor_id, day, start, end, description). */
+    /** Updates class fields by id (instructorId, day, start, end, description). */
     async edit(data: {
         id: number;
-        instructor_id?: number;
+        instructorId?: number;
         day?: string;
         start?: string;
         end?: string;
@@ -313,7 +313,7 @@ export class ClassService {
         }
         const { id, ...rest } = data;
         const updateData: Record<string, unknown> = {};
-        if (rest.instructor_id !== undefined) updateData.instructorId = rest.instructor_id;
+        if (rest.instructorId !== undefined) updateData.instructorId = rest.instructorId;
         if (rest.day !== undefined) updateData.day = rest.day;
         if (rest.start !== undefined) updateData.start = rest.start;
         if (rest.end !== undefined) updateData.end = rest.end;
