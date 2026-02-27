@@ -17,7 +17,7 @@ checkinsRouter.post("/", async (req, res, next) => {
         await checkinsService.create({
             userId: validatedBody.userId,
             classId: validatedBody.classId,
-            date: validatedBody.date ?? new Date().toISOString(),
+            date: validatedBody.date,
         });
 
         res.status(201).json({

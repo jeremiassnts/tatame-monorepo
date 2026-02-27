@@ -2,15 +2,16 @@ import { db } from "@tatame-monorepo/db";
 import { checkins, classTable, users } from "@tatame-monorepo/db/schema";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
+import type { CreateCheckinProps } from "./types";
 
 /** Service for attendance check-ins by class and user. */
 export class CheckinsService {
     constructor() { }
 
     /** Creates a check-in for the given class and user (today). No-op if one already exists. */
-    async create(checkin: { classId: number | null; userId: number | null; date?: string | null }) {
-        if (!checkin.classId || !checkin.userId) return;
-
+    async create(checkin: CreateCheckinProps) {
+        const start = startOfDay(checkin.date);
+        const end = endOfDay(checkin.date);
         const existing = await db
             .select()
             .from(checkins)
@@ -18,6 +19,8 @@ export class CheckinsService {
                 and(
                     eq(checkins.classId, checkin.classId),
                     eq(checkins.userId, checkin.userId),
+                    gte(checkins.date, start.toISOString()),
+                    lte(checkins.date, end.toISOString()),
                 ),
             );
 
@@ -28,7 +31,7 @@ export class CheckinsService {
         await db.insert(checkins).values({
             classId: checkin.classId,
             userId: checkin.userId,
-            date: checkin.date ?? new Date().toISOString(),
+            date: checkin.date.toISOString(),
         });
     }
 
@@ -72,8 +75,8 @@ export class CheckinsService {
 
     /** Lists check-ins for the user in the last 15 days. */
     async listLastCheckinsByUserId(userId: number) {
-        const fromDate: string = subDays(new Date(), 15).toISOString().slice(0, 10);
-        const toDate: string = new Date().toISOString().slice(0, 10);
+        const fromDate = startOfDay(subDays(new Date(), 15))
+        const toDate = new Date()
 
         return await db
             .select()
@@ -81,8 +84,8 @@ export class CheckinsService {
             .where(
                 and(
                     eq(checkins.userId, userId),
-                    gte(checkins.date, fromDate),
-                    lte(checkins.date, toDate),
+                    gte(checkins.date, fromDate.toISOString()),
+                    lte(checkins.date, toDate.toISOString()),
                 ),
             );
     }
@@ -118,36 +121,28 @@ export class CheckinsService {
 
     /** Lists the user's check-ins in the last 30 days with class start, end, and day. */
     async listLastMonthCheckinsByUserId(userId: number) {
-        const fromDate: string = subDays(new Date(), 30).toISOString().slice(0, 10);
-        const toDate: string = new Date().toISOString().slice(0, 10);
+        const fromDate = startOfDay(subDays(new Date(), 30))
+        const toDate = new Date()
 
         const data = await db
             .select({
                 checkin: checkins,
-                classId: classTable.id,
-                classStart: classTable.start,
-                classEnd: classTable.end,
-                classDay: classTable.day,
+                class: classTable
             })
             .from(checkins)
             .innerJoin(classTable, eq(checkins.classId, classTable.id))
             .where(
                 and(
                     eq(checkins.userId, userId),
-                    gte(checkins.date, fromDate),
-                    lte(checkins.date, toDate),
+                    gte(checkins.date, fromDate.toISOString()),
+                    lte(checkins.date, toDate.toISOString()),
                 ),
             )
             .orderBy(desc(checkins.date));
 
-        return data.map((row) => ({
+        return data.map(row => ({
             ...row.checkin,
-            class: {
-                id: row.classId,
-                start: row.classStart,
-                end: row.classEnd,
-                day: row.classDay,
-            },
-        }));
+            class: row.class,
+        }))
     }
 }

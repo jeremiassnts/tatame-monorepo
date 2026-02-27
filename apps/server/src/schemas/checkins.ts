@@ -3,7 +3,7 @@ import z from "zod";
 export const createCheckinSchema = z.object({
     userId: z.number(),
     classId: z.number(),
-    date: z.string().optional(),
+    date: z.coerce.date()
 });
 
 export const listLastCheckinsSchema = z.object({
