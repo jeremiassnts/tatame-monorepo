@@ -14,8 +14,12 @@ export const listLastMonthCheckinsSchema = z.object({
     userId: z.string().transform((val) => Number.parseInt(val, 10)),
 });
 
-export const listByClassIdSchema = z.object({
-    classId: z.string().transform((val) => Number.parseInt(val, 10)),
+export const listByClassIdParamsSchema = z.object({
+    classId: z.coerce.number(),
+});
+
+export const listByClassIdQuerySchema = z.object({
+    date: z.coerce.date(),
 });
 
 export const listByClassIdAndUserIdSchema = z.object({

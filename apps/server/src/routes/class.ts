@@ -19,7 +19,6 @@ classRouter.get("/next/:gymId", async (req, res, next) => {
 
         const classService = new ClassService();
         const nextClass = await classService.nextClass(gymId);
-
         res.json({
             data: nextClass,
         });

@@ -1,7 +1,17 @@
 import { db } from "@tatame-monorepo/db";
 import { assets, classTable, gyms, users } from "@tatame-monorepo/db/schema";
-import { addDays, format, isBefore, set } from "date-fns";
+import { format, isBefore, set } from "date-fns";
 import { and, eq, gte, isNull, lte } from "drizzle-orm";
+
+const dayOfTheWeekOrder = [
+    { name: "SUNDAY", order: 1 },
+    { name: "MONDAY", order: 2 },
+    { name: "TUESDAY", order: 3 },
+    { name: "WEDNESDAY", order: 4 },
+    { name: "THURSDAY", order: 5 },
+    { name: "FRIDAY", order: 6 },
+    { name: "SATURDAY", order: 7 },
+];
 
 /** Service for class schedule CRUD, next-class calculation, and check-in lookup. */
 export class ClassService {
@@ -13,102 +23,51 @@ export class ClassService {
             .from(classTable)
             .leftJoin(gyms, eq(classTable.gymId, gyms.id))
             .leftJoin(users, eq(classTable.instructorId, users.id))
-            .leftJoin(assets, eq(assets.classId, classTable.id))
+            .leftJoin(assets, eq(classTable.id, assets.classId))
             .where(
                 and(
                     eq(classTable.gymId, gymId),
                     isNull(classTable.deletedAt),
                 ),
             )
-            .orderBy(classTable.start);
 
         if (data.length === 0) {
             return null;
         }
 
-        // Group by class (same class may have multiple assets)
-        const classMap = new Map<
-            number,
-            {
-                id: number;
-                gymId: number | null;
-                instructorId: number | null;
-                createdBy: number | null;
-                day: string | null;
-                start: string | null;
-                end: string | null;
-                modality: string | null;
-                description: string | null;
-                createdAt: Date;
-                deletedAt: Date | null;
-                gym: { name: string } | null;
-                instructor: { firstName: string | null; lastName: string | null } | null;
-                assets: Array<{ id: number; content: string | null; type: string | null; validUntil: Date | null; createdAt: Date; title: string | null }>;
+        const sortedData = data.sort((a, b) => {
+            const aOrder = dayOfTheWeekOrder.find(item => item.name === a.class.day)?.order ?? 0;
+            const bOrder = dayOfTheWeekOrder.find(item => item.name === b.class.day)?.order ?? 0;
+            if (aOrder === bOrder) {
+                const aClassTime = convertClassTimeToDate(a.class.start ?? "");
+                const bClassTime = convertClassTimeToDate(b.class.start ?? "");
+                return isBefore(aClassTime, bClassTime) ? -1 : 1;
             }
-        >();
+            return aOrder - bOrder;
+        })
 
-        for (const row of data) {
-            const c = row.class;
-            const gym = row.gyms;
-            const instructor = row.users;
-            const asset = row.assets;
-
-            if (!classMap.has(c.id)) {
-                classMap.set(c.id, {
-                    ...c,
-                    gym: gym ? { name: gym.name } : null,
-                    instructor: instructor
-                        ? { firstName: instructor.firstName, lastName: instructor.lastName }
-                        : null,
-                    assets: [],
-                });
-            }
-
-            if (asset) {
-                const entry = classMap.get(c.id)!;
-                if (!entry.assets.some((a) => a.id === asset.id)) {
-                    entry.assets.push({
-                        id: asset.id,
-                        content: asset.content,
-                        type: asset.type,
-                        validUntil: asset.validUntil,
-                        createdAt: asset.createdAt,
-                        title: asset.title,
-                    });
-                }
-            }
+        const now = new Date();
+        const dayOfTheWeek = format(now, "EEEE").toUpperCase();
+        const todayDayOrder = dayOfTheWeekOrder.find(dto => dto.name === dayOfTheWeek)?.order ?? 0;
+        let nextClass = sortedData.find(item => {
+            const itemDayOrder = dayOfTheWeekOrder.find(dto => dto.name === item.class.day)?.order ?? 0;
+            const itemClassTime = convertClassTimeToDate(item.class.end ?? "");
+            return itemDayOrder >= todayDayOrder && isBefore(now, itemClassTime)
+        })
+        if (!nextClass) {
+            nextClass = sortedData[0];
         }
 
-        const classes = Array.from(classMap.values());
-        let today = new Date();
-        let nextClass = null;
-
-        while (!nextClass) {
-            const dayOfTheWeek = format(today, "EEEE").toUpperCase();
-            for (const item of classes) {
-                if (!item.start) continue;
-                const [hours, minutes] = item.start.split(":").map(Number);
-                const classTime = set(new Date(), {
-                    hours: hours ?? 0,
-                    minutes: minutes ?? 0,
-                    seconds: 0,
-                    milliseconds: 0,
-                });
-                if (item.day === dayOfTheWeek && isBefore(new Date(), classTime)) {
-                    nextClass = item;
-                    break;
-                }
-            }
-            today = addDays(today, 1);
-        }
-
-        const instructor = nextClass?.instructor
-            ? `${nextClass.instructor.firstName ?? ""} ${nextClass.instructor.lastName ?? ""}`.trim()
-            : "";
+        const instructor = (
+            (nextClass?.users?.firstName ?? "") +
+            " " +
+            (nextClass?.users?.lastName ?? "")
+        ).trim();
 
         return {
-            ...nextClass,
+            ...nextClass?.class,
             instructorName: instructor,
+            gym: nextClass?.gyms
         };
     }
     /** Creates a class and notifies approved students of the gym. */
@@ -346,4 +305,13 @@ export class ClassService {
 
         return result ?? null;
     }
+}
+
+function convertClassTimeToDate(time: string) {
+    return set(new Date(), {
+        hours: Number(time.split(":")[0]),
+        minutes: Number(time.split(":")[1]),
+        seconds: 0,
+        milliseconds: 0,
+    });
 }

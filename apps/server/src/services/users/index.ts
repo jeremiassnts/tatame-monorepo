@@ -20,6 +20,7 @@ type UserUpdate = Partial<Omit<User, "id">> & { id: number };
 /** Service for user CRUD, approval workflow, and user listing by gym. */
 export class UsersService {
     private rolesService: RolesService;
+    private static readonly TIMESTAMP_KEYS = ["approvedAt", "deniedAt", "migratedAt", "deletedAt"] as const;
 
     constructor() {
         this.rolesService = new RolesService();
@@ -116,8 +117,17 @@ export class UsersService {
     /** Updates user fields by id. */
     async update(data: UserUpdate): Promise<void> {
         const { id, ...updateData } = data;
+        const normalized: Record<string, unknown> = { ...updateData };
+
+        for (const key of UsersService.TIMESTAMP_KEYS) {
+            const value = normalized[key];
+            if (typeof value === "string") {
+                normalized[key] = new Date(value);
+            }
+        }
+
         await db.update(users)
-            .set(updateData)
+            .set(normalized)
             .where(eq(users.id, id));
     }
     /** Soft-deletes a user by setting deletedAt. */

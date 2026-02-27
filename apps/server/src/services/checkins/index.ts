@@ -1,6 +1,6 @@
 import { db } from "@tatame-monorepo/db";
 import { checkins, classTable, users } from "@tatame-monorepo/db/schema";
-import { subDays } from "date-fns";
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 
 /** Service for attendance check-ins by class and user. */
@@ -88,8 +88,9 @@ export class CheckinsService {
     }
 
     /** Lists today's check-ins for the class with user name and profile picture. */
-    async listByClassId(classId: number) {
-        const today: string = new Date().toISOString().slice(0, 10);
+    async listByClassId(classId: number, date: Date) {
+        const start = startOfDay(date);
+        const end = endOfDay(date);
 
         const data = await db
             .select({
@@ -103,7 +104,8 @@ export class CheckinsService {
             .where(
                 and(
                     eq(checkins.classId, classId),
-                    eq(checkins.date, today),
+                    gte(checkins.date, start.toISOString()),
+                    lte(checkins.date, end.toISOString()),
                 ),
             );
 

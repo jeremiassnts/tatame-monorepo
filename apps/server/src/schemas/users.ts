@@ -26,9 +26,9 @@ export const updateUserSchema = z.object({
     customerId: z.string().nullable().optional(),
     subscriptionId: z.string().nullable().optional(),
     plan: z.string().nullable().optional(),
-    approvedAt: z.date().nullable().optional(),
-    deniedAt: z.date().nullable().optional(),
-    migratedAt: z.date().nullable().optional(),
+    approvedAt: z.coerce.date().nullable().optional(),
+    deniedAt: z.coerce.date().nullable().optional(),
+    migratedAt: z.coerce.date().nullable().optional(),
 });
 
 export const approveStudentSchema = z.object({

@@ -1,4 +1,4 @@
-import { createCheckinSchema, listByClassIdAndUserIdSchema, listByClassIdSchema, listLastCheckinsSchema, listLastMonthCheckinsSchema } from "@/schemas/checkins";
+import { createCheckinSchema, listByClassIdAndUserIdSchema, listByClassIdParamsSchema, listByClassIdQuerySchema, listLastCheckinsSchema, listLastMonthCheckinsSchema } from "@/schemas/checkins";
 import { CheckinsService } from "@/services/checkins";
 import { Router } from "express";
 
@@ -135,12 +135,15 @@ checkinsRouter.get("/class/:classId", async (req, res, next) => {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const validatedParams = listByClassIdSchema.parse({
+        const validatedParams = listByClassIdParamsSchema.parse({
             classId: req.params.classId,
+        });
+        const validatedQuery = listByClassIdQuerySchema.parse({
+            date: req.query.date,
         });
 
         const checkinsService = new CheckinsService();
-        const checkins = await checkinsService.listByClassId(validatedParams.classId);
+        const checkins = await checkinsService.listByClassId(validatedParams.classId, validatedQuery.date);
 
         res.json({
             data: checkins,

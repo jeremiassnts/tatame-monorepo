@@ -1,5 +1,6 @@
 import { createUserSchema, updateUserSchema } from "@/schemas/users";
 import { UsersService } from "@/services/users";
+import { isNeitherUndefinedNorNull } from "@/utils/object-validation";
 import { Router } from "express";
 import multer from "multer";
 
@@ -47,8 +48,8 @@ usersRouter.get("/notification-recipients", async (req, res, next) => {
         const recipientIds: number[] = Array.isArray(raw)
             ? raw.map((id) => Number.parseInt(String(id), 10))
             : typeof raw === "string"
-              ? raw.split(",").map((id) => Number.parseInt(id.trim(), 10))
-              : [];
+                ? raw.split(",").map((id) => Number.parseInt(id.trim(), 10))
+                : [];
         const validIds = recipientIds.filter((id) => !Number.isNaN(id));
         if (validIds.length === 0) {
             return res.status(400).json({ error: "Missing or invalid recipientIds (comma-separated or repeated query param)" });
@@ -254,24 +255,24 @@ usersRouter.put("/:userId", async (req, res, next) => {
         const validatedBody = updateUserSchema.parse({ ...req.body, id: userId });
         const usersService = new UsersService();
         const updateData: Record<string, unknown> = { id: validatedBody.id };
-        if (validatedBody.clerkUserId !== undefined) updateData.clerkUserId = validatedBody.clerkUserId;
-        if (validatedBody.email !== undefined) updateData.email = validatedBody.email;
-        if (validatedBody.firstName !== undefined) updateData.firstName = validatedBody.firstName;
-        if (validatedBody.lastName !== undefined) updateData.lastName = validatedBody.lastName;
-        if (validatedBody.profilePicture !== undefined) updateData.profilePicture = validatedBody.profilePicture;
-        if (validatedBody.birth !== undefined) updateData.birth = validatedBody.birth;
-        if (validatedBody.birthDay !== undefined) updateData.birthDay = validatedBody.birthDay;
-        if (validatedBody.gender !== undefined) updateData.gender = validatedBody.gender;
-        if (validatedBody.phone !== undefined) updateData.phone = validatedBody.phone;
-        if (validatedBody.instagram !== undefined) updateData.instagram = validatedBody.instagram;
-        if (validatedBody.gymId !== undefined) updateData.gymId = validatedBody.gymId;
-        if (validatedBody.expoPushToken !== undefined) updateData.expoPushToken = validatedBody.expoPushToken;
-        if (validatedBody.customerId !== undefined) updateData.customerId = validatedBody.customerId;
-        if (validatedBody.subscriptionId !== undefined) updateData.subscriptionId = validatedBody.subscriptionId;
-        if (validatedBody.plan !== undefined) updateData.plan = validatedBody.plan;
-        if (validatedBody.approvedAt !== undefined) updateData.approvedAt = validatedBody.approvedAt;
-        if (validatedBody.deniedAt !== undefined) updateData.deniedAt = validatedBody.deniedAt;
-        if (validatedBody.migratedAt !== undefined) updateData.migratedAt = validatedBody.migratedAt;
+        if (isNeitherUndefinedNorNull(validatedBody.clerkUserId)) updateData.clerkUserId = validatedBody.clerkUserId;
+        if (isNeitherUndefinedNorNull(validatedBody.email)) updateData.email = validatedBody.email;
+        if (isNeitherUndefinedNorNull(validatedBody.firstName)) updateData.firstName = validatedBody.firstName;
+        if (isNeitherUndefinedNorNull(validatedBody.lastName)) updateData.lastName = validatedBody.lastName;
+        if (isNeitherUndefinedNorNull(validatedBody.profilePicture)) updateData.profilePicture = validatedBody.profilePicture;
+        if (isNeitherUndefinedNorNull(validatedBody.birth)) updateData.birth = validatedBody.birth;
+        if (isNeitherUndefinedNorNull(validatedBody.birthDay)) updateData.birthDay = validatedBody.birthDay;
+        if (isNeitherUndefinedNorNull(validatedBody.gender)) updateData.gender = validatedBody.gender;
+        if (isNeitherUndefinedNorNull(validatedBody.phone)) updateData.phone = validatedBody.phone;
+        if (isNeitherUndefinedNorNull(validatedBody.instagram)) updateData.instagram = validatedBody.instagram;
+        if (isNeitherUndefinedNorNull(validatedBody.gymId)) updateData.gymId = validatedBody.gymId;
+        if (isNeitherUndefinedNorNull(validatedBody.expoPushToken)) updateData.expoPushToken = validatedBody.expoPushToken;
+        if (isNeitherUndefinedNorNull(validatedBody.customerId)) updateData.customerId = validatedBody.customerId;
+        if (isNeitherUndefinedNorNull(validatedBody.subscriptionId)) updateData.subscriptionId = validatedBody.subscriptionId;
+        if (isNeitherUndefinedNorNull(validatedBody.plan)) updateData.plan = validatedBody.plan;
+        if (isNeitherUndefinedNorNull(validatedBody.approvedAt)) updateData.approvedAt = validatedBody.approvedAt;
+        if (isNeitherUndefinedNorNull(validatedBody.deniedAt)) updateData.deniedAt = validatedBody.deniedAt;
+        if (isNeitherUndefinedNorNull(validatedBody.migratedAt)) updateData.migratedAt = validatedBody.migratedAt;
         await usersService.update(updateData as { id: number } & Record<string, unknown>);
 
         res.json({
